@@ -3,7 +3,7 @@ include "header.php";
 ?>
 
 <div class="container mt-5">
-    <h1>Merhaba Bootstrap + jQuery</h1>
+    <h1>Merhaba Bootstrap + jkhjkhkhjhjkkhjjhkhjkkhj</h1>
 </div>
 
 <?php include "footer.php"; ?>
