@@ -278,4 +278,5 @@ $pageTitle = "Hakkımızda | Özel Terzi Atelier";
 </script>
 
 
+
 <?php include "footer.php"; ?>
