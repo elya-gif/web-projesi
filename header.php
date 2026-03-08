@@ -25,27 +25,43 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, sans-serif;
 }
 
+
+body{
+    background:#f4f1ea;
+    padding-top:110px; 
+    font-family: Arial, sans-serif;
+}
+
+
 .header{
-    position:sticky;
+    position:fixed;
     top:0;
-    background:#EAE6E0;
+    width:100%;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:20px 30px;
-    border-bottom:1px solid #ddd;
+    padding:30px 40px;
     z-index:1000;
+    background:transparent;
+    transition:0.3s ease;
 }
+
+
+.header.scrolled{
+    background:#EAE6E0;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
 
 .menu{
     font-size:24px;
     cursor:pointer;
+    color:#1C1C1C;
 }
 
-
+/
 .logo{
     position:absolute;
     left:50%;
@@ -55,59 +71,62 @@
 .logo a{
     text-decoration:none;
     font-family: "Cormorant Garamond", serif;
-    font-size: 32px;
-    letter-spacing: 2px;
-    font-weight: 600;
-    color: #1C1C1C; 
+    font-size:36px;
+    letter-spacing:3px;
+    font-weight:600;
+    color:#1C1C1C;
 }
 
 
-.icon{
+.nav-icons{
     display:flex;
     align-items:center;
-    gap:15px; 
+    gap:20px;
 }
 
-.icon a{
+.nav-icons a{
     text-decoration:none;
-    color:black;
-    font-size:20px;
-    transition: transform 0.2s, color 0.2s;
+    color:#1C1C1C;
+    font-size:22px;
+    transition:0.3s;
 }
 
-.icon a:hover{
-    transform: scale(1.1);
-    color:#000;
+.nav-icons a:hover{
+    opacity:0.6;
 }
 
 
-@media(min-width:768px){
-    .menu{
-        font-size:26px;
-    }
-}
+
 </style>
 </head>
 <body>
 
-<header class="header">
+<header class="header" id="header">
 
-    
-    <div class="menu">☰</div>
+    <div class="menu">
+        <i class="fa-solid fa-bars"></i>
+    </div>
 
-    
     <div class="logo">
         <a href="#">MEGAY MODA</a>
     </div>
 
-    
-    <div class="icon">
-        <a href="#"><i class="fa-solid fa-magnifying-glass"></i></a> 
+    <div class="nav-icons">
+        <a href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
         <a href="#"><i class="fa-solid fa-basket-shopping"></i></a>
         <a href="#"><i class="fa-solid fa-circle-user"></i></a>
     </div>
 
 </header>
 
+
+<script>
+window.addEventListener("scroll", function(){
+    const header = document.getElementById("header");
+    header.classList.toggle("scrolled", window.scrollY > 50);
+});
+</script>
+
 </body>
 </html>
+
