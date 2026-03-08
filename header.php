@@ -59,6 +59,8 @@ body{
     font-size:24px;
     cursor:pointer;
     color:#1C1C1C;
+    background:none;
+    border:none;
 }
 
 /
@@ -103,9 +105,9 @@ body{
 
 <header class="header" id="header">
 
-    <div class="menu">
+    <button class="menu">
         <i class="fa-solid fa-bars"></i>
-    </div>
+    </button>
 
     <div class="logo">
         <a href="#">MEGAY MODA</a>
@@ -125,6 +127,14 @@ window.addEventListener("scroll", function(){
     const header = document.getElementById("header");
     header.classList.toggle("scrolled", window.scrollY > 50);
 });
+
+const menuBtn = document.querySelector(".menu");
+const sideMenu = document.getElementById("sideMenu");
+
+menuBtn.addEventListener("click", function(){
+    sideMenu.classList.toggle("active");
+});
+
 </script>
 
 </body>
