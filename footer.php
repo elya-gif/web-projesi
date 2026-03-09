@@ -1,4 +1,4 @@
-     <!-- jQuery -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <!-- Bootstrap JS -->
@@ -81,7 +81,7 @@
 .footer-box ul li a{
     text-decoration:none;
     color:#1C1C1C;
-    transition:0.3s;  /* , padding-left 0.3s -mine farklı yaptım */
+    transition:0.3s;
 }
 .footer-box ul li a:hover{
     color:#e74c3c;
