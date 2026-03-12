@@ -60,12 +60,15 @@
     margin-bottom:40px;
 }
 .footer-box h3{
+    font-family: "Cormorant Garamond", serif;
     margin-bottom:15px;
     font-weight:600;
     display:inline-block;
     padding-bottom:5px;
     color:#6B212C;
+    
 }
+
 .footer-box p,
 .footer-box li{
     color:#1C1C1C;
