@@ -161,7 +161,7 @@ $pageTitle = "Hakkımızda | Özel Terzi Atelier";
                         Hakkımızda
                     </div>
                     <h1 class="hero-title mb-3">
-                        Her dikişte kişiye özel bir hikâye.merhaba yağmur
+                        Her dikişte kişiye özel bir hikâye.
                     </h1>
      <p class="hero-subtitle mb-3 mb-md-4">
                         Megay Moda, hazır kalıplara sığmayanlar için kuruldu. Her bedenin,
