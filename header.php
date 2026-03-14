@@ -17,7 +17,7 @@
 
 body{ 
     background:#f4f1ea; 
-    padding-top:110px; 
+    padding-top:80px; 
     font-family: Arial, sans-serif; 
 } 
 
@@ -28,7 +28,7 @@ body{
     display:flex; 
     align-items:center; 
     justify-content:space-between; 
-    padding:30px 40px; 
+    padding:50px 40px; 
     z-index:1000; 
     background:transparent; 
     transition:0.3s ease; 
@@ -36,16 +36,21 @@ body{
 
 .header.scrolled{ 
     background:#EAE6E0; 
-    box-shadow:0 2px 10px rgba(0,0,0,0.05); 
+    box-shadow:0 4px 15px rgba(0,0,0,0.05); 
 } 
 
-.menu-toggle{ 
-    font-size:24px; 
+.menu-toggle{   
+    position:absolute;
+    left:40px;
+    display:none;
+    align-items:center;
+    gap:8px;
+    font-size:20px; 
     cursor:pointer; 
     color:#1C1C1C; 
     background:none; 
     border:none; 
-}  
+}
 
 .logo{
     position:absolute; 
@@ -56,17 +61,20 @@ body{
 .logo a{ 
     text-decoration:none; 
     font-family: "Cormorant Garamond", serif; 
-    font-size:36px; 
+    font-size:48px; 
     letter-spacing:3px; 
     font-weight:600; 
     color:#1C1C1C; 
 } 
 
 .nav-icons{ 
+    position:absolute;
+    right:40px;
     display:flex; 
     align-items:center; 
     gap:20px; 
-} 
+}
+ 
 
 .nav-icons a{ 
     text-decoration:none; 
@@ -85,6 +93,7 @@ body{
     gap:30px; 
     padding:15px; 
     background:#f5f5f5; 
+    margin-top:20px;
 } 
 
 .category-bar a{ 
@@ -126,18 +135,31 @@ background:#EAE6E0;
 .mobile-menu.active{ 
     left:0; 
 } 
-     @media (max-width:768px){ 
-        .category-bar{ display:none; } 
-        
-} 
+     @media (max-width:1200px){ 
+    .category-bar{
+        display:none;
+    }
+}
+
+@media (max-width:1200px){
+
+.menu-toggle{
+display:flex;
+}
+
+}
+   
+
 
 </style> 
 </head> 
 <body> 
+
     
 <header class="header" id="header"> 
     <button class="menu-toggle"> 
         <i class="fa-solid fa-bars"></i> 
+        <span>Menü</span>
     </button> 
 
     <div class="logo"> 
@@ -152,26 +174,26 @@ background:#EAE6E0;
 </header>
 
 <nav class="category-bar"> 
-    <a href="#">Kazak</a> 
-    <a href="#">Gömlek</a> 
-    <a href="#">Elbise</a> 
-    <a href="#">Tişört</a> 
-    <a href="#">Top | Body</a> 
-    <a href="#">Etek</a>
-    <a href="#">Şort</a>
+    <a href="sayfalist.php">Kazak</a> 
+    <a href="sayfalist.php">Gömlek</a> 
+    <a href="sayfalist.php">Elbise</a> 
+    <a href="sayfalist.php">Tişört</a> 
+    <a href="sayfalist.php">Top | Body</a> 
+    <a href="sayfalist.php">Etek</a>
+    <a href="sayfalist.php">Şort</a>
 </nav>
 
 <nav class="mobile-menu" id="mobileMenu"> 
 
 <h3 class="menu-title">Kategoriler</h3>
 
-    <a href="#">Kazak</a> 
-    <a href="#">Gömlek</a> 
-    <a href="#">Elbise</a> 
-    <a href="#">Tişört</a> 
-    <a href="#">Top | Body</a> 
-    <a href="#">Etek</a>
-    <a href="#">Şort</a>
+    <a href="sayfalist.php">Kazak</a> 
+    <a href="sayfalist.php">Gömlek</a> 
+    <a href="sayfalist.php">Elbise</a> 
+    <a href="sayfalist.php">Tişört</a> 
+    <a href="sayfalist.php">Top | Body</a> 
+    <a href="sayfalist.php">Etek</a>
+    <a href="sayfalist.php">Şort</a>
 </nav> 
 
 <script>
