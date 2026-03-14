@@ -146,10 +146,9 @@
         <div class="footer-box">
             <h3>Hızlı Menü</h3>
             <ul>
-                <li><a href="index.php">Ana Sayfa</a></li>
-                <li><a href="hakkimizda.php">Hakkımızda</a></li>
+                <li><a href="sayfalist.php">Ana Sayfa</a></li>
+                <li><a href="iletisim.php">Hakkımızda</a></li>
                 <li><a href="hizmetler.php">Hizmetler</a></li>
-                <li><a href="iletisim.php"></a></li>
             </ul>
         </div>
 
@@ -171,7 +170,7 @@
             
 
             <div class="social-icons mt-3">
-                <a href="#">Instagram</a>
+                <a href="https://instagram.com/megaymoda" target="_blank">Instagram</a>
                 
                 
             </div>
