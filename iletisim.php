@@ -39,21 +39,21 @@ $pageTitle = "Hakkımızda | Özel Terzi Atelier";
 
         .hero-label {
     font-family: 'Great Vibes', cursive;  
-    font-size: 5rem;                      
-    font-weight: 400;
+    font-size: 4rem;                      
+    font-weight: 300;
     font-style: normal;
     letter-spacing: 0;
     text-transform: none;                
     color: var(--accent-deep);
     display: flex;
     align-items: center;
-    gap: .5rem;
+    gap: .4rem;
 }
 
 .hero-label-dot {
-    width: .35rem;
-    height: .35rem;
-    border-radius: 999px;
+    width: .25rem;
+    height: .25rem;
+    border-radius: 500px;
     background: var(--accent-deep);
 }
 

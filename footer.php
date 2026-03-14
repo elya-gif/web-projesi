@@ -146,9 +146,12 @@
         <div class="footer-box">
             <h3>Hızlı Menü</h3>
             <ul>
+
+
                 <li><a href="sayfalist.php">Ana Sayfa</a></li>
                 <li><a href="iletisim.php">Hakkımızda</a></li>
                 <li><a href="hizmetler.php">Hizmetler</a></li>
+
             </ul>
         </div>
 
