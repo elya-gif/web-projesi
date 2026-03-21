@@ -42,7 +42,7 @@ foreach ($cart_items as $row) {
 $grand_total = $subtotal + $shipping_estimate;
 ?>
 
-<!-- iletisim / sayfalist ile aynı: Bootstrap tekrar (header’da da var; tutarlılık için) -->
+
 <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     rel="stylesheet"
@@ -51,7 +51,7 @@ $grand_total = $subtotal + $shipping_estimate;
 >
 
 <style>
-    /* iletisim.php ile aynı mantık: header’daki bej body’yi bu sayfada beyaza çeker */
+    
     :root {
         --bg-main: #ffffff;
         --text-main: #111111;
