@@ -7,8 +7,6 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -163,9 +161,13 @@ display:flex;
 
 <header class="header" id="header">
 
-<button class="menu-toggle">
-<i class="fa-solid fa-bars"></i>
-<span>Menü</span>
+<button class="menu-toggle"> 
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" stroke="black" fill="none" stroke-width="2" viewBox="0 0 24 24">
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+    <span>Menü</span>
 </button>
 
 <div class="logo">
@@ -173,9 +175,37 @@ display:flex;
 </div>
 
 <div class="nav-icons">
-<a href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
-<a href="#"><i class="fa-solid fa-basket-shopping"></i></a>
-<a href="#"><i class="fa-solid fa-circle-user"></i></a>
+
+    <a href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+    </a>
+
+    <a href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 21s-7-4.5-9-8.5C1 8 3.5 5 6.5 5c2 0 3.5 1.5 5.5 3.5C14 6.5 15.5 5 17.5 5 20.5 5 23 8 21 12.5 19 16.5 12 21 12 21z"/>
+</svg>
+</a>
+
+    <a href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M6 6h15l-1.5 9h-13z"></path>
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="18" cy="21" r="1"></circle>
+        </svg>
+    </a>
+
+    <a href="giris.php">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="7" r="4"></circle>
+            <path d="M5.5 21a8.38 8.38 0 0 1 13 0"></path>
+        </svg>
+    </a>
+
+
+
 </div>
 
 </header>
