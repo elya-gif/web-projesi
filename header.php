@@ -183,13 +183,13 @@ display:flex;
         </svg>
     </a>
 
-    <a href="#">
+    <a href="favoriler.php">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
             <path d="M12 21s-7-4.5-9-8.5C1 8 3.5 5 6.5 5c2 0 3.5 1.5 5.5 3.5C14 6.5 15.5 5 17.5 5 20.5 5 23 8 21 12.5 19 16.5 12 21 12 21z"/>
 </svg>
 </a>
 
-    <a href="#">
+    <a href="sepet.php">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
             <path d="M6 6h15l-1.5 9h-13z"></path>
             <circle cx="9" cy="21" r="1"></circle>

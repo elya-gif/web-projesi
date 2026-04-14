@@ -42,7 +42,7 @@ foreach ($cart_items as $row) {
 $grand_total = $subtotal + $shipping_estimate;
 ?>
 
-
+<!-- iletisim / sayfalist ile aynı: Bootstrap tekrar (header’da da var; tutarlılık için) -->
 <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     rel="stylesheet"
@@ -51,7 +51,7 @@ $grand_total = $subtotal + $shipping_estimate;
 >
 
 <style>
-    
+    /* iletisim.php ile aynı mantık: header’daki bej body’yi bu sayfada beyaza çeker */
     :root {
         --bg-main: #ffffff;
         --text-main: #111111;
@@ -323,7 +323,11 @@ $grand_total = $subtotal + $shipping_estimate;
                     ?>
                     <div class="cart-item"
                          data-cart-index="<?php echo (int)$index; ?>"
-                         data-unit-price="<?php echo htmlspecialchars((string)$item['price'], ENT_QUOTES, 'UTF-8'); ?>">
+                         data-unit-price="<?php echo htmlspecialchars((string)$item['price'], ENT_QUOTES, 'UTF-8'); ?>"
+                         data-product-id="<?php echo (int)$item['id']; ?>"
+                         data-product-name="<?php echo htmlspecialchars($item['name'], ENT_QUOTES, 'UTF-8'); ?>"
+                         data-product-price="<?php echo htmlspecialchars((string)$item['price'], ENT_QUOTES, 'UTF-8'); ?>"
+                         data-product-image="<?php echo htmlspecialchars($item['image'], ENT_QUOTES, 'UTF-8'); ?>">
                         <div class="cart-item-img-wrap">
                             <img src="<?php echo htmlspecialchars($item['image']); ?>" alt="">
                             <button type="button" class="cart-item-fav" aria-label="Favori">♡</button>
@@ -373,7 +377,7 @@ $grand_total = $subtotal + $shipping_estimate;
                         <span id="cartGrandTotal"><?php echo number_format($grand_total, 2, ',', '.'); ?> TL</span>
                     </div>
 
-                    <a href="odeme.php" class="btn-cart-checkout">Ödeme ekranına devam et</a>
+                    <a href="odeme-kontrol.php" class="btn-cart-checkout">Ödeme ekranına devam et</a>
 
                     <?php if (!$logged_in): ?>
                     <a href="giris.php" class="btn-cart-login">Oturum aç</a>
@@ -388,6 +392,7 @@ $grand_total = $subtotal + $shipping_estimate;
 <?php if (!empty($cart_items)): ?>
 <script>
 (function () {
+    var FAV_KEY = 'megay_favorites';
     var shipping = <?php echo json_encode($shipping_estimate); ?>;
 
     function formatPrice(n) {
@@ -416,11 +421,43 @@ $grand_total = $subtotal + $shipping_estimate;
         }
     }
 
+    function getFavorites() {
+        try {
+            var raw = localStorage.getItem(FAV_KEY);
+            var parsed = raw ? JSON.parse(raw) : [];
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveFavorites(items) {
+        localStorage.setItem(FAV_KEY, JSON.stringify(items));
+    }
+
+    function toggleFavorite(product) {
+        var list = getFavorites();
+        var index = list.findIndex(function (item) {
+            return String(item.id) === String(product.id);
+        });
+
+        if (index > -1) {
+            list.splice(index, 1);
+            saveFavorites(list);
+            return false;
+        }
+
+        list.unshift(product);
+        saveFavorites(list);
+        return true;
+    }
+
     document.querySelectorAll('.cart-item').forEach(function (row) {
         var valEl = row.querySelector('.cart-qty-val');
         var minus = row.querySelector('.cart-btn-minus');
         var plus = row.querySelector('.cart-btn-plus');
         var remove = row.querySelector('.cart-btn-remove');
+        var favBtn = row.querySelector('.cart-item-fav');
 
         plus.addEventListener('click', function () {
             var q = parseInt(valEl.textContent, 10) + 1;
@@ -442,6 +479,27 @@ $grand_total = $subtotal + $shipping_estimate;
             }
             recalc();
         });
+
+        if (favBtn) {
+            var productData = {
+                id: row.getAttribute('data-product-id') || row.getAttribute('data-cart-index'),
+                name: row.getAttribute('data-product-name') || '',
+                price: parseFloat(row.getAttribute('data-product-price') || '0'),
+                image: row.getAttribute('data-product-image') || '',
+                category: 'sepet',
+                url: 'urun-detay.php?id=' + (row.getAttribute('data-product-id') || '')
+            };
+
+            var active = getFavorites().some(function (item) {
+                return String(item.id) === String(productData.id);
+            });
+            favBtn.textContent = active ? '♥' : '♡';
+
+            favBtn.addEventListener('click', function () {
+                var added = toggleFavorite(productData);
+                favBtn.textContent = added ? '♥' : '♡';
+            });
+        }
     });
 })();
 </script>
