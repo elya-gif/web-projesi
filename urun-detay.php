@@ -303,7 +303,12 @@ include "header.php";
                 <button class="btn-add-to-cart" id="addToCartBtn">
                     Sepete ekle
                 </button>
-                <button class="btn-fav" id="favBtn" aria-label="Favorilere ekle">
+                <button class="btn-fav" id="favBtn" aria-label="Favorilere ekle"
+                    data-product-id="3"
+                    data-product-name="Basic ribana top"
+                    data-product-price="399.50"
+                    data-product-image="images/toplar/top-detay-1.jpg"
+                    data-product-category="toplar">
                     ♥
                 </button>
             </div>
@@ -354,9 +359,62 @@ include "header.php";
         });
     });
 
+    const FAV_KEY = 'megay_favorites';
     const favBtn = document.getElementById('favBtn');
+
+    function getFavorites() {
+        try {
+            const raw = localStorage.getItem(FAV_KEY);
+            const parsed = raw ? JSON.parse(raw) : [];
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveFavorites(items) {
+        localStorage.setItem(FAV_KEY, JSON.stringify(items));
+    }
+
+    function isFavorite(productId) {
+        return getFavorites().some(function (item) {
+            return String(item.id) === String(productId);
+        });
+    }
+
+    function toggleFavorite(product) {
+        const list = getFavorites();
+        const index = list.findIndex(function (item) {
+            return String(item.id) === String(product.id);
+        });
+
+        if (index > -1) {
+            list.splice(index, 1);
+            saveFavorites(list);
+            return false;
+        }
+
+        list.unshift(product);
+        saveFavorites(list);
+        return true;
+    }
+
+    const detailProduct = {
+        id: favBtn.getAttribute('data-product-id'),
+        name: favBtn.getAttribute('data-product-name'),
+        price: parseFloat(favBtn.getAttribute('data-product-price') || '0'),
+        image: favBtn.getAttribute('data-product-image'),
+        category: favBtn.getAttribute('data-product-category'),
+        url: 'urun-detay.php?id=' + (favBtn.getAttribute('data-product-id') || '')
+    };
+
+    if (isFavorite(detailProduct.id)) {
+        favBtn.classList.add('active');
+    }
+
     favBtn.addEventListener('click', function () {
-        this.classList.toggle('active');
+        const added = toggleFavorite(detailProduct);
+        this.classList.toggle('active', added);
     });
 
     document.getElementById('addToCartBtn').addEventListener('click', function () {

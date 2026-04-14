@@ -422,7 +422,10 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
                 <div class="col-6 col-md-4 col-lg-3">
                     <div class="pb-product-card"
                          data-product-id="<?php echo (int)$product['id']; ?>"
-                         data-product-name="<?php echo htmlspecialchars($product['name'], ENT_QUOTES); ?>">
+                         data-product-name="<?php echo htmlspecialchars($product['name'], ENT_QUOTES); ?>"
+                         data-product-price="<?php echo htmlspecialchars((string)$product['price'], ENT_QUOTES); ?>"
+                         data-product-image="<?php echo htmlspecialchars($product['image'], ENT_QUOTES); ?>"
+                         data-product-category="<?php echo htmlspecialchars($product['category'], ENT_QUOTES); ?>">
 
                         <div class="pb-image-wrapper">
                             <img
@@ -505,11 +508,66 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
 ></script>
 
 <script>
+    const FAV_KEY = 'megay_favorites';
+
+    function getFavorites() {
+        try {
+            const raw = localStorage.getItem(FAV_KEY);
+            const parsed = raw ? JSON.parse(raw) : [];
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveFavorites(items) {
+        localStorage.setItem(FAV_KEY, JSON.stringify(items));
+    }
+
+    function isFavorite(productId) {
+        return getFavorites().some(function (item) {
+            return String(item.id) === String(productId);
+        });
+    }
+
+    function toggleFavorite(product) {
+        const list = getFavorites();
+        const index = list.findIndex(function (item) {
+            return String(item.id) === String(product.id);
+        });
+
+        if (index > -1) {
+            list.splice(index, 1);
+            saveFavorites(list);
+            return false;
+        }
+
+        list.unshift(product);
+        saveFavorites(list);
+        return true;
+    }
+
     // Favori kalp
     document.querySelectorAll('.js-fav').forEach(function (btn) {
+        const card = btn.closest('.pb-product-card');
+        const heart = btn.querySelector('.pb-heart');
+        const productId = card.getAttribute('data-product-id');
+        const productData = {
+            id: productId,
+            name: card.getAttribute('data-product-name') || '',
+            price: parseFloat(card.getAttribute('data-product-price') || '0'),
+            image: card.getAttribute('data-product-image') || '',
+            category: card.getAttribute('data-product-category') || '',
+            url: 'urun-detay.php?id=' + productId
+        };
+
+        if (isFavorite(productId)) {
+            heart.classList.add('active');
+        }
+
         btn.addEventListener('click', function () {
-            const heart = this.querySelector('.pb-heart');
-            heart.classList.toggle('active');
+            const added = toggleFavorite(productData);
+            heart.classList.toggle('active', added);
         });
     });
 
