@@ -59,16 +59,17 @@ body {
 </style>
 
 <div class="auth-container">
-    <h2>OTURUM AÇ</h2>
+    <h2>KAYIT OL</h2>
 
     <form action="" method="POST">
+        <input type="text" name="ad" placeholder="AD SOYAD" required>
         <input type="email" name="email" placeholder="E-POSTA" required>
         <input type="password" name="sifre" placeholder="ŞİFRE" required>
-        <button type="submit" name="giris">OTURUM AÇ</button>
+        <button type="submit" name="kayit">KAYIT OL</button>
     </form>
 
     <div class="alt-link">
-        Hesabın yok mu? <a href="kayit.php">Kayıt Ol</a>
+        Zaten hesabın var mı? <a href="giris.php">Oturum Aç</a>
     </div>
 </div>
 
