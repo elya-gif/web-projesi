@@ -56,10 +56,44 @@ body {
     color: black;
     text-decoration: underline;
 }
+
+/* Hata mesajı */
+.auth-error {
+    background: #fff5f5;
+    border-left: 3px solid #e63946;
+    color: #c0392b;
+    font-size: 13px;
+    padding: 10px 12px;
+    margin-bottom: 20px;
+    letter-spacing: 0.3px;
+}
+
+/* Başarı mesajı */
+.auth-success {
+    background: #f5fff8;
+    border-left: 3px solid #2ecc71;
+    color: #1a7a40;
+    font-size: 13px;
+    padding: 10px 12px;
+    margin-bottom: 20px;
+    letter-spacing: 0.3px;
+}
 </style>
 
 <div class="auth-container">
     <h2>KAYIT OL</h2>
+
+    <?php if (!empty($hata)): ?>
+        <div class="auth-error">
+            <?= htmlspecialchars($hata) ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($basari)): ?>
+        <div class="auth-success">
+            <?= htmlspecialchars($basari) ?>
+        </div>
+    <?php endif; ?>
 
     <form action="" method="POST">
         <input type="text" name="ad" placeholder="AD SOYAD" required>
