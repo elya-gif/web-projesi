@@ -3,7 +3,15 @@
 // GELİŞTİRİCİ A'NIN DB KODU BURAYA GELECEK
 // Şimdilik test için sahte veri kullanılıyor:
  
- $urun = null; 
+ $urun =  [
+    'id'       => 1,
+    'ad'       => 'Basic ribana top',
+    'fiyat'    => '399,50',
+    'renk'     => 'Beyaz',
+    'aciklama' => 'İnce ribana dokulu, yuvarlak yaka, dar kesim basic top. Günlük kullanıma uygun esnek kumaş.',
+    'resim'    => 'images/toplar/top-detay-1.jpg',
+    'kategori' => 'toplar'
+];
 
 // ============================================================
 
