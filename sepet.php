@@ -3,10 +3,8 @@ include "header.php";
 
 $pageTitle = "Alışveriş Sepeti | Megay Moda";
 
-// Oturum: kendi yapına göre değiştir
-// session_start();
-// $logged_in = isset($_SESSION['user_id']);
-$logged_in = false; // true yapınca "Oturum aç" butonu gizlenir
+// session_start() header.php'de yapılıyor, tekrar yazmaya gerek yok
+$logged_in = isset($_SESSION['kullanici_id']);
 
 // Örnek sepet verisi (veritabanı / session gelince doldurulacak)
 $cart_items = [
@@ -42,7 +40,6 @@ foreach ($cart_items as $row) {
 $grand_total = $subtotal + $shipping_estimate;
 ?>
 
-<!-- iletisim / sayfalist ile aynı: Bootstrap tekrar (header’da da var; tutarlılık için) -->
 <link
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     rel="stylesheet"
@@ -51,7 +48,6 @@ $grand_total = $subtotal + $shipping_estimate;
 >
 
 <style>
-    /* iletisim.php ile aynı mantık: header’daki bej body’yi bu sayfada beyaza çeker */
     :root {
         --bg-main: #ffffff;
         --text-main: #111111;
@@ -65,7 +61,6 @@ $grand_total = $subtotal + $shipping_estimate;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    /* iletisim: .page-wrapper — sepet sayfası için aynı dolgu ve min-height */
     .page-wrapper.sepet-page {
         min-height: 100vh;
         padding: 3rem 1rem 4rem;

@@ -1,6 +1,27 @@
 <?php
-include "header.php";
+// ============================================================
+// GELİŞTİRİCİ A'NIN DB KODU BURAYA GELECEK
+// Şimdilik test için sahte veri kullanılıyor:
+ 
+ $urun =  [
+    'id'       => 1,
+    'ad'       => 'Basic ribana top',
+    'fiyat'    => '399,50',
+    'renk'     => 'Beyaz',
+    'aciklama' => 'İnce ribana dokulu, yuvarlak yaka, dar kesim basic top. Günlük kullanıma uygun esnek kumaş.',
+    'resim'    => 'images/toplar/top-detay-1.jpg',
+    'kategori' => 'toplar'
+];
+
+// ============================================================
+
+// 404 kontrolü — ürün bulunamazsa yönlendir
+if (!$urun) {
+    header("Location: 404.php");
+    exit;
+}
 ?>
+<?php include "header.php"; ?>
 
 <style>
     :root {
@@ -250,18 +271,18 @@ include "header.php";
 
 <div class="page-wrapper">
     <nav class="breadcrumb">
-      <a href="#">Toplar</a> / Basic ribana top
+        <a href="sayfalist.php">Ürünler</a> / <?= htmlspecialchars($urun['ad']) ?>
     </nav>
 
     <div class="row g-4">
         <div class="col-12 col-md-7">
             <div class="gallery-main" id="mainImage">
-                <img src="images/toplar/top-detay-1.jpg" alt="Basic ribana top">
+                <img src="<?= htmlspecialchars($urun['resim']) ?>" alt="<?= htmlspecialchars($urun['ad']) ?>">
             </div>
 
             <div class="gallery-thumbs mt-2">
-                <div class="gallery-thumb active" data-image="images/toplar/top-detay-1.jpg">
-                    <img src="images/toplar/top-detay-1.jpg" alt="">
+                <div class="gallery-thumb active" data-image="<?= htmlspecialchars($urun['resim']) ?>">
+                    <img src="<?= htmlspecialchars($urun['resim']) ?>" alt="">
                 </div>
                 <div class="gallery-thumb" data-image="images/toplar/top-detay-2.jpg">
                     <img src="images/toplar/top-detay-2.jpg" alt="">
@@ -273,13 +294,12 @@ include "header.php";
         </div>
 
         <div class="col-12 col-md-5">
-            <h1 class="product-title">Basic ribana top</h1>
-           
+            <h1 class="product-title"><?= htmlspecialchars($urun['ad']) ?></h1>
 
-            <div class="product-price">399,50 TL</div>
+            <div class="product-price"><?= htmlspecialchars($urun['fiyat']) ?> TL</div>
 
             <div class="product-color">
-                Renk: <strong>Beyaz</strong>
+                Renk: <strong><?= htmlspecialchars($urun['renk']) ?></strong>
             </div>
             <div class="color-swatches">
                 <div class="color-dot active" style="background:#ffffff;"></div>
@@ -304,21 +324,21 @@ include "header.php";
                     Sepete ekle
                 </button>
                 <button class="btn-fav" id="favBtn" aria-label="Favorilere ekle"
-                    data-product-id="3"
-                    data-product-name="Basic ribana top"
-                    data-product-price="399.50"
-                    data-product-image="images/toplar/top-detay-1.jpg"
-                    data-product-category="toplar">
+                    data-product-id="<?= $urun['id'] ?>"
+                    data-product-name="<?= htmlspecialchars($urun['ad']) ?>"
+                    data-product-price="<?= htmlspecialchars($urun['fiyat']) ?>"
+                    data-product-image="<?= htmlspecialchars($urun['resim']) ?>"
+                    data-product-category="<?= htmlspecialchars($urun['kategori']) ?>">
                     ♥
                 </button>
             </div>
 
             <div class="delivery-info">
-                <strong>Teslimat:</strong> Standart gönderim 2-5 iş günü içinde gerçekleşmektedir. 
+                <strong>Teslimat:</strong> Standart gönderim 2-5 iş günü içinde gerçekleşmektedir.
             </div>
 
             <div class="product-description">
-                <strong>Ürün açıklaması:</strong> İnce ribana dokulu, yuvarlak yaka, dar kesim basic top. Günlük kullanıma uygun esnek kumaş.
+                <strong>Ürün açıklaması:</strong> <?= htmlspecialchars($urun['aciklama']) ?>
             </div>
 
             <ul class="detail-list">
@@ -425,6 +445,5 @@ include "header.php";
         alert('Ürün sepete eklendi. Beden: ' + selectedSize);
     });
 </script>
-
 
 <?php include "footer.php"; ?>
