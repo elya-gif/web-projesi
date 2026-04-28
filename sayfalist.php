@@ -1,17 +1,6 @@
 <?php
 include 'config.php';
-
-if (isset($_GET['kategori']) && $_GET['kategori'] !== 'tum') {
-    $stmt = $pdo->prepare('SELECT * FROM urunler WHERE kategori = ?');
-    $stmt->execute([$_GET['kategori']]);
-} else {
-    $stmt = $pdo->query('SELECT * FROM urunler');
-}
-
-$urunler = $stmt->fetchAll(PDO::FETCH_ASSOC);
-?>
-<?php
- include 'header.php';
+include 'header.php';
 
 $currentCategory = isset($_GET['kategori']) ? $_GET['kategori'] : 'tum';
 
@@ -25,69 +14,15 @@ $categories = [
     'tisortler' => 'Tişörtler',
 ];
 
-$products = [
-    [
-        'id'       => 1,
-        'name'     => 'Drapeli Midi Elbise',
-        'price'    => 1299.90,
-        'old_price'=> 0,
-        'image'    => 'images/elbiseler/elbiseler-1.jpg',
-        'category' => 'elbiseler',
-        'tag'      => 'Yeni',
-    ],
-    [
-        'id'       => 2,
-        'name'     => 'Oversize Keten Ceket',
-        'price'    => 1499.00,
-        'old_price'=> 1799.00,
-        'image'    => 'images/ceketler/ceket-1.jpg',
-        'category' => 'ceketler',
-        'tag'      => 'İndirim',
-    ],
-    [
-        'id'       => 3,
-        'name'     => 'Basic Ribana Top',
-        'price'    => 399.50,
-        'old_price'=> 0,
-        'image'    => 'images/toplar/top-1.jpg',
-        'category' => 'toplar',
-        'tag'      => '',
-    ],
-    [
-        'id'       => 4,
-        'name'     => 'Askılı Body',
-        'price'    => 449.00,
-        'old_price'=> 0,
-        'image'    => 'images/bodyler/body-1.jpg',
-        'category' => 'bodyler',
-        'tag'      => 'Yeni',
-    ],
-    [
-        'id'       => 5,
-        'name'     => 'Yüksek Bel Şort',
-        'price'    => 549.90,
-        'old_price'=> 0,
-        'image'    => 'images/sortlar/sort-1.jpg',
-        'category' => 'sortlar',
-        'tag'      => '',
-    ],
-    [
-        'id'       => 6,
-        'name'     => 'Oversize Baskılı Tişört',
-        'price'    => 299.90,
-        'old_price'=> 0,
-        'image'    => 'images/tisortler/tisort-1.jpg',
-        'category' => 'tisortler',
-        'tag'      => 'Favori',
-    ],
-];
+// DB'den ürünleri çek
+if ($currentCategory !== 'tum') {
+    $stmt = $pdo->prepare('SELECT * FROM urunler WHERE kategori = ?');
+    $stmt->execute([$currentCategory]);
+} else {
+    $stmt = $pdo->query('SELECT * FROM urunler');
+}
 
-$filteredProducts = array_filter($products, function ($product) use ($currentCategory) {
-    if ($currentCategory === 'tum') {
-        return true;
-    }
-    return $product['category'] === $currentCategory;
-});
+$urunler = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory] : $categories['tum'];
 ?>
@@ -97,7 +32,6 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
     <title><?php echo htmlspecialchars($pageTitle); ?> | Koleksiyon</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap 5 CSS -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
@@ -138,6 +72,31 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
         .pb-collection-subtitle {
             font-size: .9rem;
             color: var(--muted-text);
+        }
+
+        .pb-category-tab {
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            background-color: #f7f7f7;
+            color: var(--text-color);
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            padding: .35rem .9rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .pb-category-tab:hover {
+            background-color: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .pb-category-tab.active {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #fff;
         }
 
         .pb-product-card {
@@ -223,7 +182,6 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
         .pb-heart { color: #888; }
         .pb-heart.active { color: var(--heart-active); }
 
-        /* Hover panel: beden + ekle */
         .pb-hover-panel {
             position: absolute;
             left: 0;
@@ -244,7 +202,7 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
 
         @media (max-width: 768px) {
             .pb-hover-panel {
-                bottom: 0; /* mobilde hep açık kalsın istersen */
+                bottom: 0;
             }
         }
 
@@ -316,34 +274,6 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             letter-spacing: .12em;
         }
 
-        .pb-cart-indicator {
-            position: fixed;
-            right: 18px;
-            bottom: 72px;
-            z-index: 1050;
-            background-color: #000;
-            color: #fff;
-            padding: .55rem .8rem;
-            border-radius: 999px;
-            font-size: .8rem;
-            display: flex;
-            align-items: center;
-            gap: .4rem;
-            box-shadow: 0 12px 30px rgba(0,0,0,.28);
-        }
-
-        .pb-cart-count {
-            min-width: 22px;
-            height: 22px;
-            border-radius: 999px;
-            background-color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: .75rem;
-            font-weight: 600;
-        }
-
         .pb-scroll-top {
             position: fixed;
             right: 18px;
@@ -373,46 +303,54 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             line-height: 1;
         }
     </style>
-
+</head>
 
 <div class="container py-4">
     <div class="pb-collection-header">
         <h1 class="pb-collection-title mb-1">
             <?php echo htmlspecialchars($pageTitle); ?>
         </h1>
-        <p class="pb-collection-subtitle mb-0">
-            <!-- buraya sayfanın üstüne istersen yazı ekleyeceksin sildim ben -->
-        </p>
+        <p class="pb-collection-subtitle mb-0"></p>
     </div>
 
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div class="small text-muted">
-            <?php echo count($filteredProducts); ?> ürün gösteriliyor
+            <?php echo count($urunler); ?> ürün gösteriliyor
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <?php foreach ($categories as $slug => $label): ?>
+                <a
+                    href="?kategori=<?php echo urlencode($slug); ?>"
+                    class="pb-category-tab <?php echo $slug === $currentCategory ? 'active' : ''; ?>"
+                >
+                    <?php echo htmlspecialchars($label); ?>
+                </a>
+            <?php endforeach; ?>
         </div>
     </div>
 
-    <?php if (empty($filteredProducts)): ?>
+    <?php if (empty($urunler)): ?>
         <p class="text-muted small">Bu kategori için henüz ürün eklenmedi.</p>
     <?php else: ?>
         <div class="row g-3 g-md-4">
-            <?php foreach ($filteredProducts as $product): ?>
+            <?php foreach ($urunler as $urun): ?>
                 <div class="col-6 col-md-4 col-lg-3">
                     <div class="pb-product-card"
-                         data-product-id="<?php echo (int)$product['id']; ?>"
-                         data-product-name="<?php echo htmlspecialchars($product['name'], ENT_QUOTES); ?>"
-                         data-product-price="<?php echo htmlspecialchars((string)$product['price'], ENT_QUOTES); ?>"
-                         data-product-image="<?php echo htmlspecialchars($product['image'], ENT_QUOTES); ?>"
-                         data-product-category="<?php echo htmlspecialchars($product['category'], ENT_QUOTES); ?>">
+                         data-product-id="<?php echo (int)$urun['id']; ?>"
+                         data-product-name="<?php echo htmlspecialchars($urun['ad'], ENT_QUOTES); ?>"
+                         data-product-price="<?php echo htmlspecialchars((string)$urun['fiyat'], ENT_QUOTES); ?>"
+                         data-product-image="<?php echo htmlspecialchars($urun['resim'], ENT_QUOTES); ?>"
+                         data-product-category="<?php echo htmlspecialchars($urun['kategori'], ENT_QUOTES); ?>">
 
                         <div class="pb-image-wrapper">
                             <img
-                                src="<?php echo htmlspecialchars($product['image']); ?>"
-                                alt="<?php echo htmlspecialchars($product['name']); ?>"
+                                src="<?php echo htmlspecialchars($urun['resim']); ?>"
+                                alt="<?php echo htmlspecialchars($urun['ad']); ?>"
                             >
 
-                            <?php if (!empty($product['tag'])): ?>
+                            <?php if (!empty($urun['etiket'])): ?>
                                 <div class="pb-badge">
-                                    <?php echo htmlspecialchars($product['tag']); ?>
+                                    <?php echo htmlspecialchars($urun['etiket']); ?>
                                 </div>
                             <?php endif; ?>
 
@@ -439,22 +377,22 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
 
                         <div class="pb-info">
                             <div class="pb-name">
-                                <?php echo htmlspecialchars($product['name']); ?>
+                                <?php echo htmlspecialchars($urun['ad']); ?>
                             </div>
 
                             <div class="pb-price-row">
                                 <div class="pb-price">
-                                    <?php echo number_format($product['price'], 2, ',', '.'); ?> TL
+                                    <?php echo number_format($urun['fiyat'], 2, ',', '.'); ?> TL
                                 </div>
-                                <?php if (!empty($product['old_price']) && $product['old_price'] > 0): ?>
+                                <?php if (!empty($urun['eski_fiyat']) && $urun['eski_fiyat'] > 0): ?>
                                     <div class="pb-old-price">
-                                        <?php echo number_format($product['old_price'], 2, ',', '.'); ?> TL
+                                        <?php echo number_format($urun['eski_fiyat'], 2, ',', '.'); ?> TL
                                     </div>
                                 <?php endif; ?>
                             </div>
 
                             <div class="pb-meta">
-                                <?php echo strtoupper(str_replace('_', ' ', $product['category'])); ?> • Özel dikim
+                                <?php echo strtoupper($urun['kategori']); ?> • Özel dikim
                             </div>
 
                             <div class="pb-actions-bottom mt-2">
@@ -471,13 +409,10 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
     <?php endif; ?>
 </div>
 
-
-
 <button class="pb-scroll-top" id="scrollTopBtn" aria-label="Yukarı çık">
     <span>&uarr;</span>
 </button>
 
-<!-- Bootstrap 5 JS (Bundle) -->
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
@@ -524,7 +459,6 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
         return true;
     }
 
-    // Favori kalp
     document.querySelectorAll('.js-fav').forEach(function (btn) {
         const card = btn.closest('.pb-product-card');
         const heart = btn.querySelector('.pb-heart');
@@ -549,31 +483,28 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
     });
 
     document.querySelectorAll('.js-hover-add').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-        const card = this.closest('.pb-product-card');
-        const select = card.querySelector('.pb-size-select');
-        const size = select.value;
+        btn.addEventListener('click', function () {
+            const card = this.closest('.pb-product-card');
+            const select = card.querySelector('.pb-size-select');
+            const size = select.value;
 
-        if (!size) {
-            alert('Lütfen beden seçiniz.');
-            return;
-        }
+            if (!size) {
+                alert('Lütfen beden seçiniz.');
+                return;
+            }
 
-        // Burada gerçek sepete ekleme (AJAX vs.) yapılabilir
-        alert('Ürün sepete eklendi. Beden: ' + size);
+            alert('Ürün sepete eklendi. Beden: ' + size);
+        });
     });
-});
 
-    // İncele (ürün detay sayfasına yönlendirme)
     document.querySelectorAll('.js-quick-view').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const card = this.closest('.pb-product-card');
             const productId = card.getAttribute('data-product-id');
-            window.location.href = 'urun-detay.php?id=' + productId; // kendi yapına göre değiştir
+            window.location.href = 'urun-detay.php?id=' + productId;
         });
     });
 
-    // Yukarı çık butonu
     const scrollBtn = document.getElementById('scrollTopBtn');
 
     window.addEventListener('scroll', function () {
@@ -589,6 +520,4 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
     });
 </script>
 
-<?php
- include 'footer.php';
-?>
+<?php include 'footer.php'; ?>
