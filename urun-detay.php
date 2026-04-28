@@ -1,7 +1,19 @@
 <?php
+include 'config.php';
+
+$id = $_GET['id'];
+
+$stmt = $pdo->prepare('SELECT * FROM urunler WHERE id = ?');
+$stmt->execute([$id]);
+$urun = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$urun) {
+    header('Location: 404.php');
+    exit;
+}
+
 include "header.php";
 ?>
-
 <style>
     :root {
         --bg-color: #ffffff;
@@ -273,10 +285,10 @@ include "header.php";
         </div>
 
         <div class="col-12 col-md-5">
-            <h1 class="product-title">Basic ribana top</h1>
+            <h1 class="product-title"><?= htmlspecialchars($urun['ad']) ?></h1>
            
 
-            <div class="product-price">399,50 TL</div>
+            <div class="product-price"><?= number_format($urun['fiyat'], 2, ',', '.') ?> TL</div>
 
             <div class="product-color">
                 Renk: <strong>Beyaz</strong>
@@ -318,7 +330,7 @@ include "header.php";
             </div>
 
             <div class="product-description">
-                <strong>Ürün açıklaması:</strong> İnce ribana dokulu, yuvarlak yaka, dar kesim basic top. Günlük kullanıma uygun esnek kumaş.
+                <strong>Ürün açıklaması:</strong> <?= htmlspecialchars($urun['aciklama']) ?>
             </div>
 
             <ul class="detail-list">
