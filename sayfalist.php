@@ -128,31 +128,6 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             color: var(--muted-text);
         }
 
-        .pb-category-tab {
-            border-radius: 999px;
-            border: 1px solid var(--border-color);
-            background-color: #f7f7f7;
-            color: var(--text-color);
-            font-size: .75rem;
-            text-transform: uppercase;
-            letter-spacing: .12em;
-            padding: .35rem .9rem;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .pb-category-tab:hover {
-            background-color: #000;
-            color: #fff;
-            border-color: #000;
-        }
-
-        .pb-category-tab.active {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-            color: #fff;
-        }
-
         .pb-product-card {
             border-radius: .75rem;
             border: 1px solid var(--border-color);
@@ -401,16 +376,6 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div class="small text-muted">
             <?php echo count($filteredProducts); ?> ürün gösteriliyor
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-            <?php foreach ($categories as $slug => $label): ?>
-                <a
-                    href="?kategori=<?php echo urlencode($slug); ?>"
-                    class="pb-category-tab <?php echo $slug === $currentCategory ? 'active' : ''; ?>"
-                >
-                    <?php echo htmlspecialchars($label); ?>
-                </a>
-            <?php endforeach; ?>
         </div>
     </div>
 
