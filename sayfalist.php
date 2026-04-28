@@ -1,4 +1,16 @@
 <?php
+include 'config.php';
+
+if (isset($_GET['kategori']) && $_GET['kategori'] !== 'tum') {
+    $stmt = $pdo->prepare('SELECT * FROM urunler WHERE kategori = ?');
+    $stmt->execute([$_GET['kategori']]);
+} else {
+    $stmt = $pdo->query('SELECT * FROM urunler');
+}
+
+$urunler = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+<?php
  include 'header.php';
 
 $currentCategory = isset($_GET['kategori']) ? $_GET['kategori'] : 'tum';

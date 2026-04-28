@@ -1,5 +1,22 @@
 <?php
-// ============================================================
+
+include 'config.php';
+
+$id = $_GET['id'];
+
+$stmt = $pdo->prepare('SELECT * FROM urunler WHERE id = ?');
+$stmt->execute([$id]);
+$urun = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$urun) {
+    header('Location: 404.php');
+    exit;
+}
+
+include "header.php";
+?>
+
+
 // GELİŞTİRİCİ A'NIN DB KODU BURAYA GELECEK
 // Şimdilik test için sahte veri kullanılıyor:
  
@@ -13,7 +30,6 @@
     'kategori' => 'toplar'
 ];
 
-// ============================================================
 
 // 404 kontrolü — ürün bulunamazsa yönlendir
 if (!$urun) {
@@ -21,7 +37,8 @@ if (!$urun) {
     exit;
 }
 ?>
-<?php include "header.php"; ?>
+
+
 
 <style>
     :root {
@@ -296,7 +313,10 @@ if (!$urun) {
         <div class="col-12 col-md-5">
             <h1 class="product-title"><?= htmlspecialchars($urun['ad']) ?></h1>
 
-            <div class="product-price"><?= htmlspecialchars($urun['fiyat']) ?> TL</div>
+           
+
+            <div class="product-price"><?= number_format($urun['fiyat'], 2, ',', '.') ?> TL</div>
+
 
             <div class="product-color">
                 Renk: <strong><?= htmlspecialchars($urun['renk']) ?></strong>
