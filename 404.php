@@ -1,3 +1,5 @@
+
+<?php http_response_code(404); ?>
 <?php include "header.php"; ?>
 
 <style>
@@ -45,7 +47,7 @@ body {
         Aradığınız sayfa bulunamadı.
     </div>
 
-    <a href="index.php">ANASAYFAYA DÖN</a>
+    <a href="sayfalist.php">ANASAYFAYA DÖN</a>
 </div>
 
 <?php include "footer.php"; ?>
