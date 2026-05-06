@@ -1,38 +1,8 @@
-
 <?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-?>
 
-
-
-
-
-
-
-
-
-
-
-
-
-<?php
 include 'config.php';
-
-
-if (isset($_GET['kategori']) && $_GET['kategori'] !== 'tum') {
-    $stmt = $pdo->prepare('SELECT * FROM urunler WHERE kategori = ?');
-    $stmt->execute([$_GET['kategori']]);
-} else {
-    $stmt = $pdo->query('SELECT * FROM urunler');
-}
-
-$urunler = $stmt->fetchAll(PDO::FETCH_ASSOC);
-?>
-<?php
-include 'header.php';
-
-
 
 $currentCategory = isset($_GET['kategori']) ? $_GET['kategori'] : 'tum';
 
@@ -61,7 +31,8 @@ $urunler = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory] : $categories['tum'];
 ?>
-
+<!DOCTYPE html>
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <title><?php echo htmlspecialchars($pageTitle); ?> | Koleksiyon</title>
@@ -107,6 +78,31 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             color: var(--muted-text);
         }
 
+        .pb-category-tab {
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            background-color: #f7f7f7;
+            color: var(--text-color);
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            padding: .35rem .9rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .pb-category-tab:hover {
+            background-color: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .pb-category-tab.active {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #fff;
+        }
+
         .pb-product-card {
             border-radius: .75rem;
             border: 1px solid var(--border-color);
@@ -141,6 +137,19 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
         }
 
         .pb-product-card:hover .pb-image-wrapper img { transform: scale(1.05); }
+
+        .pb-badge {
+            position: absolute;
+            top: .5rem;
+            left: .5rem;
+            padding: .25rem .6rem;
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            background-color: var(--badge-bg);
+            color: var(--badge-text);
+            border-radius: 999px;
+        }
 
         .pb-actions-top {
             position: absolute;
@@ -231,6 +240,12 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
 
         .pb-price { font-size: .95rem; font-weight: 600; }
 
+        .pb-old-price {
+            font-size: .8rem;
+            color: var(--muted-text);
+            text-decoration: line-through;
+        }
+
         .pb-meta {
             font-size: .7rem;
             color: var(--muted-text);
@@ -266,6 +281,9 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
         .pb-scroll-top span { font-size: 1.1rem; line-height: 1; }
     </style>
 </head>
+<body>
+
+<?php include 'header.php'; ?>
 
 <div class="container py-4">
     <div class="pb-collection-header">
@@ -276,6 +294,16 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div class="small text-muted">
             <?php echo count($urunler); ?> ürün gösteriliyor
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <?php foreach ($categories as $slug => $label): ?>
+                <a
+                    href="?kategori=<?php echo urlencode($slug); ?>"
+                    class="pb-category-tab <?php echo $slug === $currentCategory ? 'active' : ''; ?>"
+                >
+                    <?php echo htmlspecialchars($label); ?>
+                </a>
+            <?php endforeach; ?>
         </div>
     </div>
 
@@ -289,14 +317,20 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
                          data-product-id="<?php echo (int)$urun['id']; ?>"
                          data-product-name="<?php echo htmlspecialchars($urun['ad'], ENT_QUOTES); ?>"
                          data-product-price="<?php echo htmlspecialchars((string)$urun['fiyat'], ENT_QUOTES); ?>"
-                         data-product-image="<?php echo htmlspecialchars($urun['gorsel'], ENT_QUOTES); ?>"
+                         data-product-image="<?php echo htmlspecialchars($urun['resim'], ENT_QUOTES); ?>"
                          data-product-category="<?php echo htmlspecialchars($urun['kategori'], ENT_QUOTES); ?>">
 
                         <div class="pb-image-wrapper">
                             <img
-                                src="images/<?php echo htmlspecialchars($urun['gorsel']); ?>"
+                                src="<?php echo htmlspecialchars($urun['resim']); ?>"
                                 alt="<?php echo htmlspecialchars($urun['ad']); ?>"
                             >
+
+                            <?php if (!empty($urun['etiket'])): ?>
+                                <div class="pb-badge">
+                                    <?php echo htmlspecialchars($urun['etiket']); ?>
+                                </div>
+                            <?php endif; ?>
 
                             <div class="pb-actions-top">
                                 <button class="pb-icon-btn js-fav" type="button" aria-label="Favorilere ekle">
@@ -324,6 +358,11 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
                                 <div class="pb-price">
                                     <?php echo number_format($urun['fiyat'], 2, ',', '.'); ?> TL
                                 </div>
+                                <?php if (!empty($urun['eski_fiyat']) && $urun['eski_fiyat'] > 0): ?>
+                                    <div class="pb-old-price">
+                                        <?php echo number_format($urun['eski_fiyat'], 2, ',', '.'); ?> TL
+                                    </div>
+                                <?php endif; ?>
                             </div>
 
                             <div class="pb-meta">
@@ -433,3 +472,6 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
 </script>
 
 <?php include 'footer.php'; ?>
+
+</body>
+</html>
