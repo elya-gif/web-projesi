@@ -342,13 +342,35 @@ include "header.php";
         this.classList.toggle('active', added);
     });
 
-    document.getElementById('addToCartBtn').addEventListener('click', function () {
-        if (!selectedSize) {
-            alert('Lütfen bir beden seçin.');
-            return;
-        }
-        alert('Ürün sepete eklendi. Beden: ' + selectedSize);
+   document.getElementById('addToCartBtn').addEventListener('click', function () {
+    if (!selectedSize) {
+        alert('Lütfen bir beden seçin.');
+        return;
+    }
+
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'sepete-ekle.php';
+
+    var fields = {
+        urun_id: '<?= (int)$urun["id"] ?>',
+        ad:      '<?= addslashes($urun["ad"]) ?>',
+        fiyat:   '<?= (float)$urun["fiyat"] ?>',
+        gorsel:  '<?= addslashes($urun["gorsel"]) ?>',
+        beden:   selectedSize
+    };
+
+    Object.keys(fields).forEach(function(key) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = fields[key];
+        form.appendChild(input);
     });
+
+    document.body.appendChild(form);
+    form.submit();
+});
 </script>
 
 <?php include "footer.php"; ?>
