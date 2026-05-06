@@ -1,4 +1,33 @@
-<?php include "header.php"; ?>
+<?php
+session_start();
+include 'config.php';
+
+$hata = '';
+$basari = '';
+
+if (isset($_POST['kayit'])) {
+    $ad = trim($_POST['ad']);
+    $email = trim($_POST['email']);
+    $sifre = $_POST['sifre'];
+
+    // E-posta zaten kayıtlı mı kontrol et
+    $stmt = $pdo->prepare('SELECT id FROM kullanicilar WHERE eposta = ?');
+    $stmt->execute([$email]);
+    $mevcut = $stmt->fetch();
+
+    if ($mevcut) {
+        $hata = 'Bu e-posta adresi zaten kayıtlı.';
+    } else {
+        // Şifreyi hashle ve kaydet
+        $hash = password_hash($sifre, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare('INSERT INTO kullanicilar (ad, eposta, sifre) VALUES (?, ?, ?)');
+        $stmt->execute([$ad, $email, $hash]);
+        $basari = 'Kayıt başarılı! Giriş yapabilirsiniz.';
+    }
+}
+
+include "header.php";
+?>
 
 <style>
 body {
