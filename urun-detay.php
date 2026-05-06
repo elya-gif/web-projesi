@@ -1,8 +1,7 @@
 <?php
-
 include 'config.php';
 
-$id = $_GET['id'];
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 $stmt = $pdo->prepare('SELECT * FROM urunler WHERE id = ?');
 $stmt->execute([$id]);
@@ -15,30 +14,6 @@ if (!$urun) {
 
 include "header.php";
 ?>
-
-
-// GELİŞTİRİCİ A'NIN DB KODU BURAYA GELECEK
-// Şimdilik test için sahte veri kullanılıyor:
- 
- $urun =  [
-    'id'       => 1,
-    'ad'       => 'Basic ribana top',
-    'fiyat'    => '399,50',
-    'renk'     => 'Beyaz',
-    'aciklama' => 'İnce ribana dokulu, yuvarlak yaka, dar kesim basic top. Günlük kullanıma uygun esnek kumaş.',
-    'resim'    => 'images/toplar/top-detay-1.jpg',
-    'kategori' => 'toplar'
-];
-
-
-// 404 kontrolü — ürün bulunamazsa yönlendir
-if (!$urun) {
-    header("Location: 404.php");
-    exit;
-}
-?>
-
-
 
 <style>
     :root {
@@ -74,9 +49,7 @@ if (!$urun) {
         text-decoration: none;
     }
 
-    .breadcrumb a:hover {
-        text-decoration: underline;
-    }
+    .breadcrumb a:hover { text-decoration: underline; }
 
     .gallery-main {
         position: relative;
@@ -116,20 +89,12 @@ if (!$urun) {
         display: block;
     }
 
-    .gallery-thumb.active {
-        border-color: #000;
-    }
+    .gallery-thumb.active { border-color: #000; }
 
     .product-title {
         font-size: 1.4rem;
         font-weight: 600;
         margin-bottom: .25rem;
-    }
-
-    .product-subtitle {
-        font-size: .9rem;
-        color: var(--muted-text);
-        margin-bottom: .5rem;
     }
 
     .product-price {
@@ -138,40 +103,7 @@ if (!$urun) {
         margin-bottom: .1rem;
     }
 
-    .product-old-price {
-        font-size: .9rem;
-        color: var(--muted-text);
-        text-decoration: line-through;
-    }
-
-    .product-color {
-        font-size: .85rem;
-        margin-top: .75rem;
-        margin-bottom: .35rem;
-    }
-
-    .color-swatches {
-        display: flex;
-        gap: .3rem;
-        margin-bottom: 1rem;
-    }
-
-    .color-dot {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        border: 1px solid #ccc;
-        cursor: pointer;
-    }
-
-    .color-dot.active {
-        border-color: #000;
-    }
-
-    .size-label {
-        font-size: .85rem;
-        margin-bottom: .3rem;
-    }
+    .size-label { font-size: .85rem; margin-bottom: .3rem; }
 
     .size-grid {
         display: flex;
@@ -190,9 +122,7 @@ if (!$urun) {
         cursor: pointer;
     }
 
-    .size-btn:hover {
-        border-color: #000;
-    }
+    .size-btn:hover { border-color: #000; }
 
     .size-btn.active {
         border-color: #000;
@@ -225,9 +155,7 @@ if (!$urun) {
         cursor: pointer;
     }
 
-    .btn-add-to-cart:hover {
-        background-color: #7A90A8;
-    }
+    .btn-add-to-cart:hover { opacity: 0.9; }
 
     .btn-fav {
         width: 42px;
@@ -261,28 +189,15 @@ if (!$urun) {
         font-weight: 500;
     }
 
-    .detail-list {
-        list-style: none;
-        padding-left: 0;
-        margin-bottom: .7rem;
-    }
-
-    .detail-list li {
+    .stok-uyari {
         font-size: .85rem;
-        color: var(--muted-text);
-    }
-
-    .detail-list li::before {
-        content: "• ";
+        color: #e63946;
+        margin-bottom: .75rem;
     }
 
     @media (max-width: 768px) {
-        .page-wrapper {
-            padding-top: 16px;
-        }
-        .product-title {
-            margin-top: 12px;
-        }
+        .page-wrapper { padding-top: 16px; }
+        .product-title { margin-top: 12px; }
     }
 </style>
 
@@ -294,18 +209,12 @@ if (!$urun) {
     <div class="row g-4">
         <div class="col-12 col-md-7">
             <div class="gallery-main" id="mainImage">
-                <img src="<?= htmlspecialchars($urun['resim']) ?>" alt="<?= htmlspecialchars($urun['ad']) ?>">
+                <img src="images/<?= htmlspecialchars($urun['gorsel']) ?>" alt="<?= htmlspecialchars($urun['ad']) ?>">
             </div>
 
             <div class="gallery-thumbs mt-2">
-                <div class="gallery-thumb active" data-image="<?= htmlspecialchars($urun['resim']) ?>">
-                    <img src="<?= htmlspecialchars($urun['resim']) ?>" alt="">
-                </div>
-                <div class="gallery-thumb" data-image="images/toplar/top-detay-2.jpg">
-                    <img src="images/toplar/top-detay-2.jpg" alt="">
-                </div>
-                <div class="gallery-thumb" data-image="images/toplar/top-detay-3.jpg">
-                    <img src="images/toplar/top-detay-3.jpg" alt="">
+                <div class="gallery-thumb active" data-image="images/<?= htmlspecialchars($urun['gorsel']) ?>">
+                    <img src="images/<?= htmlspecialchars($urun['gorsel']) ?>" alt="">
                 </div>
             </div>
         </div>
@@ -313,19 +222,13 @@ if (!$urun) {
         <div class="col-12 col-md-5">
             <h1 class="product-title"><?= htmlspecialchars($urun['ad']) ?></h1>
 
-           
-
             <div class="product-price"><?= number_format($urun['fiyat'], 2, ',', '.') ?> TL</div>
 
-
-            <div class="product-color">
-                Renk: <strong><?= htmlspecialchars($urun['renk']) ?></strong>
-            </div>
-            <div class="color-swatches">
-                <div class="color-dot active" style="background:#ffffff;"></div>
-                <div class="color-dot" style="background:#000000;"></div>
-                <div class="color-dot" style="background:#1f2a44;"></div>
-            </div>
+            <?php if ((int)$urun['stok'] === 0): ?>
+                <div class="stok-uyari">⚠ Bu ürün stokta bulunmamaktadır.</div>
+            <?php elseif ((int)$urun['stok'] <= 3): ?>
+                <div class="stok-uyari">Son <?= (int)$urun['stok'] ?> ürün kaldı!</div>
+            <?php endif; ?>
 
             <div class="size-label">Beden seçin</div>
             <div class="size-grid" id="sizeGrid">
@@ -340,14 +243,14 @@ if (!$urun) {
             </div>
 
             <div class="action-row">
-                <button class="btn-add-to-cart" id="addToCartBtn">
-                    Sepete ekle
+                <button class="btn-add-to-cart" id="addToCartBtn" <?= (int)$urun['stok'] === 0 ? 'disabled' : '' ?>>
+                    <?= (int)$urun['stok'] === 0 ? 'Stokta Yok' : 'Sepete ekle' ?>
                 </button>
                 <button class="btn-fav" id="favBtn" aria-label="Favorilere ekle"
                     data-product-id="<?= $urun['id'] ?>"
                     data-product-name="<?= htmlspecialchars($urun['ad']) ?>"
                     data-product-price="<?= htmlspecialchars($urun['fiyat']) ?>"
-                    data-product-image="<?= htmlspecialchars($urun['resim']) ?>"
+                    data-product-image="<?= htmlspecialchars($urun['gorsel']) ?>"
                     data-product-category="<?= htmlspecialchars($urun['kategori']) ?>">
                     ♥
                 </button>
@@ -357,16 +260,11 @@ if (!$urun) {
                 <strong>Teslimat:</strong> Standart gönderim 2-5 iş günü içinde gerçekleşmektedir.
             </div>
 
+            <?php if (!empty($urun['aciklama'])): ?>
             <div class="product-description">
                 <strong>Ürün açıklaması:</strong> <?= htmlspecialchars($urun['aciklama']) ?>
             </div>
-
-            <ul class="detail-list">
-                <li>Fit: Dar kesim</li>
-                <li>Uzunluk: Normal boy</li>
-                <li>Kol tipi: Kolsuz</li>
-                <li>Kumaş: Pamuk karışımlı, esnek</li>
-            </ul>
+            <?php endif; ?>
 
             <div class="care-info">
                 <strong>Bakım talimatları:</strong> Benzer renklerle 30°C'de yıkayın, ters çevirerek ütüleyin.
@@ -380,7 +278,6 @@ if (!$urun) {
         thumb.addEventListener('click', function () {
             const src = this.getAttribute('data-image');
             document.querySelector('#mainImage img').src = src;
-
             document.querySelectorAll('.gallery-thumb').forEach(function (t) {
                 t.classList.remove('active');
             });
@@ -407,9 +304,7 @@ if (!$urun) {
             const raw = localStorage.getItem(FAV_KEY);
             const parsed = raw ? JSON.parse(raw) : [];
             return Array.isArray(parsed) ? parsed : [];
-        } catch (e) {
-            return [];
-        }
+        } catch (e) { return []; }
     }
 
     function saveFavorites(items) {
@@ -427,16 +322,8 @@ if (!$urun) {
         const index = list.findIndex(function (item) {
             return String(item.id) === String(product.id);
         });
-
-        if (index > -1) {
-            list.splice(index, 1);
-            saveFavorites(list);
-            return false;
-        }
-
-        list.unshift(product);
-        saveFavorites(list);
-        return true;
+        if (index > -1) { list.splice(index, 1); saveFavorites(list); return false; }
+        list.unshift(product); saveFavorites(list); return true;
     }
 
     const detailProduct = {
@@ -448,9 +335,7 @@ if (!$urun) {
         url: 'urun-detay.php?id=' + (favBtn.getAttribute('data-product-id') || '')
     };
 
-    if (isFavorite(detailProduct.id)) {
-        favBtn.classList.add('active');
-    }
+    if (isFavorite(detailProduct.id)) { favBtn.classList.add('active'); }
 
     favBtn.addEventListener('click', function () {
         const added = toggleFavorite(detailProduct);

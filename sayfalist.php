@@ -1,5 +1,24 @@
+
+<?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+?>
+
+
+
+
+
+
+
+
+
+
+
+
+
 <?php
 include 'config.php';
+
 
 if (isset($_GET['kategori']) && $_GET['kategori'] !== 'tum') {
     $stmt = $pdo->prepare('SELECT * FROM urunler WHERE kategori = ?');
@@ -13,6 +32,8 @@ $urunler = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php
 include 'header.php';
 
+
+
 $currentCategory = isset($_GET['kategori']) ? $_GET['kategori'] : 'tum';
 
 $categories = [
@@ -23,6 +44,9 @@ $categories = [
     'bodyler'   => 'Bodyler',
     'sortlar'   => 'Şortlar',
     'tisortler' => 'Tişörtler',
+    'etek'      => 'Etekler',
+    'gomlek'    => 'Gömlekler',
+    'kazak'     => 'Kazaklar',
 ];
 
 // DB'den ürünleri çek
@@ -69,9 +93,7 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
-        .pb-collection-header {
-            margin-bottom: 1.5rem;
-        }
+        .pb-collection-header { margin-bottom: 1.5rem; }
 
         .pb-collection-title {
             font-size: 1.75rem;
@@ -83,31 +105,6 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
         .pb-collection-subtitle {
             font-size: .9rem;
             color: var(--muted-text);
-        }
-
-        .pb-category-tab {
-            border-radius: 999px;
-            border: 1px solid var(--border-color);
-            background-color: #f7f7f7;
-            color: var(--text-color);
-            font-size: .75rem;
-            text-transform: uppercase;
-            letter-spacing: .12em;
-            padding: .35rem .9rem;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .pb-category-tab:hover {
-            background-color: #000;
-            color: #fff;
-            border-color: #000;
-        }
-
-        .pb-category-tab.active {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-            color: #fff;
         }
 
         .pb-product-card {
@@ -143,22 +140,7 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             transition: transform .4s ease;
         }
 
-        .pb-product-card:hover .pb-image-wrapper img {
-            transform: scale(1.05);
-        }
-
-        .pb-badge {
-            position: absolute;
-            top: .5rem;
-            left: .5rem;
-            padding: .25rem .6rem;
-            font-size: .7rem;
-            text-transform: uppercase;
-            letter-spacing: .1em;
-            background-color: var(--badge-bg);
-            color: var(--badge-text);
-            border-radius: 999px;
-        }
+        .pb-product-card:hover .pb-image-wrapper img { transform: scale(1.05); }
 
         .pb-actions-top {
             position: absolute;
@@ -195,9 +177,7 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
 
         .pb-hover-panel {
             position: absolute;
-            left: 0;
-            right: 0;
-            bottom: -80px;
+            left: 0; right: 0; bottom: -80px;
             padding: .5rem .6rem;
             background-color: rgba(255,255,255,.96);
             display: flex;
@@ -207,15 +187,9 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             z-index: 2;
         }
 
-        .pb-product-card:hover .pb-hover-panel {
-            bottom: 0;
-        }
+        .pb-product-card:hover .pb-hover-panel { bottom: 0; }
 
-        @media (max-width: 768px) {
-            .pb-hover-panel {
-                bottom: 0;
-            }
-        }
+        @media (max-width: 768px) { .pb-hover-panel { bottom: 0; } }
 
         .pb-size-select {
             flex: 1;
@@ -237,9 +211,7 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             cursor: pointer;
         }
 
-        .pb-hover-add:hover {
-            background-color: #111;
-        }
+        .pb-hover-add:hover { background-color: #111; }
 
         .pb-info {
             padding: .25rem .25rem .2rem;
@@ -249,10 +221,7 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             flex-grow: 1;
         }
 
-        .pb-name {
-            font-size: .9rem;
-            font-weight: 500;
-        }
+        .pb-name { font-size: .9rem; font-weight: 500; }
 
         .pb-price-row {
             display: flex;
@@ -260,16 +229,7 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             gap: .4rem;
         }
 
-        .pb-price {
-            font-size: .95rem;
-            font-weight: 600;
-        }
-
-        .pb-old-price {
-            font-size: .8rem;
-            color: var(--muted-text);
-            text-decoration: line-through;
-        }
+        .pb-price { font-size: .95rem; font-weight: 600; }
 
         .pb-meta {
             font-size: .7rem;
@@ -287,10 +247,8 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
 
         .pb-scroll-top {
             position: fixed;
-            right: 18px;
-            bottom: 18px;
-            width: 40px;
-            height: 40px;
+            right: 18px; bottom: 18px;
+            width: 40px; height: 40px;
             border: 1px solid #000;
             background-color: #fff;
             color: #000;
@@ -304,39 +262,20 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             transition: opacity .2s ease;
         }
 
-        .pb-scroll-top.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .pb-scroll-top span {
-            font-size: 1.1rem;
-            line-height: 1;
-        }
+        .pb-scroll-top.visible { opacity: 1; pointer-events: auto; }
+        .pb-scroll-top span { font-size: 1.1rem; line-height: 1; }
     </style>
 </head>
 
 <div class="container py-4">
     <div class="pb-collection-header">
-        <h1 class="pb-collection-title mb-1">
-            <?php echo htmlspecialchars($pageTitle); ?>
-        </h1>
+        <h1 class="pb-collection-title mb-1"><?php echo htmlspecialchars($pageTitle); ?></h1>
         <p class="pb-collection-subtitle mb-0"></p>
     </div>
 
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div class="small text-muted">
             <?php echo count($urunler); ?> ürün gösteriliyor
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-            <?php foreach ($categories as $slug => $label): ?>
-                <a
-                    href="?kategori=<?php echo urlencode($slug); ?>"
-                    class="pb-category-tab <?php echo $slug === $currentCategory ? 'active' : ''; ?>"
-                >
-                    <?php echo htmlspecialchars($label); ?>
-                </a>
-            <?php endforeach; ?>
         </div>
     </div>
 
@@ -350,20 +289,14 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
                          data-product-id="<?php echo (int)$urun['id']; ?>"
                          data-product-name="<?php echo htmlspecialchars($urun['ad'], ENT_QUOTES); ?>"
                          data-product-price="<?php echo htmlspecialchars((string)$urun['fiyat'], ENT_QUOTES); ?>"
-                         data-product-image="<?php echo htmlspecialchars($urun['resim'], ENT_QUOTES); ?>"
+                         data-product-image="<?php echo htmlspecialchars($urun['gorsel'], ENT_QUOTES); ?>"
                          data-product-category="<?php echo htmlspecialchars($urun['kategori'], ENT_QUOTES); ?>">
 
                         <div class="pb-image-wrapper">
                             <img
-                                src="<?php echo htmlspecialchars($urun['resim']); ?>"
+                                src="images/<?php echo htmlspecialchars($urun['gorsel']); ?>"
                                 alt="<?php echo htmlspecialchars($urun['ad']); ?>"
                             >
-
-                            <?php if (!empty($urun['etiket'])): ?>
-                                <div class="pb-badge">
-                                    <?php echo htmlspecialchars($urun['etiket']); ?>
-                                </div>
-                            <?php endif; ?>
 
                             <div class="pb-actions-top">
                                 <button class="pb-icon-btn js-fav" type="button" aria-label="Favorilere ekle">
@@ -380,26 +313,17 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
                                     <option value="L">L</option>
                                     <option value="XL">XL</option>
                                 </select>
-                                <button class="pb-hover-add js-hover-add" type="button">
-                                    Ekle
-                                </button>
+                                <button class="pb-hover-add js-hover-add" type="button">Ekle</button>
                             </div>
                         </div>
 
                         <div class="pb-info">
-                            <div class="pb-name">
-                                <?php echo htmlspecialchars($urun['ad']); ?>
-                            </div>
+                            <div class="pb-name"><?php echo htmlspecialchars($urun['ad']); ?></div>
 
                             <div class="pb-price-row">
                                 <div class="pb-price">
                                     <?php echo number_format($urun['fiyat'], 2, ',', '.'); ?> TL
                                 </div>
-                                <?php if (!empty($urun['eski_fiyat']) && $urun['eski_fiyat'] > 0): ?>
-                                    <div class="pb-old-price">
-                                        <?php echo number_format($urun['eski_fiyat'], 2, ',', '.'); ?> TL
-                                    </div>
-                                <?php endif; ?>
                             </div>
 
                             <div class="pb-meta">
@@ -438,9 +362,7 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             const raw = localStorage.getItem(FAV_KEY);
             const parsed = raw ? JSON.parse(raw) : [];
             return Array.isArray(parsed) ? parsed : [];
-        } catch (e) {
-            return [];
-        }
+        } catch (e) { return []; }
     }
 
     function saveFavorites(items) {
@@ -458,16 +380,8 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
         const index = list.findIndex(function (item) {
             return String(item.id) === String(product.id);
         });
-
-        if (index > -1) {
-            list.splice(index, 1);
-            saveFavorites(list);
-            return false;
-        }
-
-        list.unshift(product);
-        saveFavorites(list);
-        return true;
+        if (index > -1) { list.splice(index, 1); saveFavorites(list); return false; }
+        list.unshift(product); saveFavorites(list); return true;
     }
 
     document.querySelectorAll('.js-fav').forEach(function (btn) {
@@ -483,9 +397,7 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             url: 'urun-detay.php?id=' + productId
         };
 
-        if (isFavorite(productId)) {
-            heart.classList.add('active');
-        }
+        if (isFavorite(productId)) { heart.classList.add('active'); }
 
         btn.addEventListener('click', function () {
             const added = toggleFavorite(productData);
@@ -498,12 +410,7 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
             const card = this.closest('.pb-product-card');
             const select = card.querySelector('.pb-size-select');
             const size = select.value;
-
-            if (!size) {
-                alert('Lütfen beden seçiniz.');
-                return;
-            }
-
+            if (!size) { alert('Lütfen beden seçiniz.'); return; }
             alert('Ürün sepete eklendi. Beden: ' + size);
         });
     });
@@ -517,15 +424,9 @@ $pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory
     });
 
     const scrollBtn = document.getElementById('scrollTopBtn');
-
     window.addEventListener('scroll', function () {
-        if (window.scrollY > 250) {
-            scrollBtn.classList.add('visible');
-        } else {
-            scrollBtn.classList.remove('visible');
-        }
+        scrollBtn.classList.toggle('visible', window.scrollY > 250);
     });
-
     scrollBtn.addEventListener('click', function () {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
