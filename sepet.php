@@ -7,30 +7,24 @@ $pageTitle = "Alışveriş Sepeti | Megay Moda";
 $logged_in = isset($_SESSION['kullanici_id']);
 
 // Örnek sepet verisi (veritabanı / session gelince doldurulacak)
-$cart_items = [
-    [
-        'id'         => 1,
-        'brand'      => 'Atölye',
-        'name'       => 'Drapeli thong body',
-        'price'      => 749.99,
-        'image'      => 'images/cart/body-1.jpg',
-        'product_no' => '1336782002',
-        'color'      => 'Siyah',
-        'size'       => 'M',
-        'qty'        => 1,
-    ],
-    [
-        'id'         => 2,
-        'brand'      => 'Atölye',
-        'name'       => 'Basic ribana top',
-        'price'      => 399.50,
-        'image'      => 'images/cart/top-1.jpg',
-        'product_no' => '1336782111',
-        'color'      => 'Beyaz',
-        'size'       => 'S',
-        'qty'        => 2,
-    ],
-];
+
+$cart_items = [];
+
+if (!empty($_SESSION['sepet'])) {
+    foreach ($_SESSION['sepet'] as $urun) {
+        $cart_items[] = [
+            'id'         => $urun['id'],
+            'brand'      => 'Megay Moda',
+            'name'       => $urun['ad'],
+            'price'      => $urun['fiyat'],
+            'image'      => $urun['gorsel'],
+            'product_no' => $urun['id'],
+            'color'      => '-',
+            'size'       => '-',
+            'qty'        => $urun['adet'],
+        ];
+    }
+}
 
 $shipping_estimate = 49.90;
 $subtotal = 0;

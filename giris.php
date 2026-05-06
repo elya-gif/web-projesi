@@ -1,4 +1,32 @@
-<?php include "header.php"; ?>
+<?php
+session_start();
+include 'config.php';
+
+$hata = '';
+$basari = '';
+
+if (isset($_POST['giris'])) {
+    $email = trim($_POST['email']);
+    $sifre = $_POST['sifre'];
+
+    // Kullanıcıyı veritabanında ara
+    $stmt = $pdo->prepare('SELECT * FROM kullanicilar WHERE eposta = ?');
+    $stmt->execute([$email]);
+    $kullanici = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($kullanici && password_verify($sifre, $kullanici['sifre'])) {
+        // Giriş başarılı, SESSION başlat
+        $_SESSION['kullanici_id'] = $kullanici['id'];
+        $_SESSION['kullanici_ad'] = $kullanici['ad'];
+        header('Location: profil.php');
+        exit;
+    } else {
+        $hata = 'E-posta veya şifre hatalı.';
+    }
+}
+
+include "header.php";
+?>
 
 <style>
 body {
