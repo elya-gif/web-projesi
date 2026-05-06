@@ -4,6 +4,12 @@ include 'config.php';
 
 $hata = '';
 $basari = '';
+$defaultRedirect = 'profil.php';
+$allowedRedirects = ['profil.php', 'odeme.php', 'sepet.php'];
+$redirect = isset($_GET['redirect']) ? trim((string)$_GET['redirect']) : $defaultRedirect;
+if (!in_array($redirect, $allowedRedirects, true)) {
+    $redirect = $defaultRedirect;
+}
 
 if (isset($_POST['giris'])) {
     $email = trim($_POST['email']);
@@ -18,7 +24,9 @@ if (isset($_POST['giris'])) {
         // Giriş başarılı, SESSION başlat
         $_SESSION['kullanici_id'] = $kullanici['id'];
         $_SESSION['kullanici_ad'] = $kullanici['ad'];
-        header('Location: profil.php');
+        $_SESSION['kullanici_email'] = $kullanici['eposta'];
+        $_SESSION['user_id'] = $kullanici['id'];
+        header('Location: ' . $redirect);
         exit;
     } else {
         $hata = 'E-posta veya şifre hatalı.';

@@ -87,10 +87,28 @@ text-decoration:none;
 color:#1C1C1C;
 font-size:22px;
 transition:0.3s;
+position:relative;
 }
 
 .nav-icons a:hover{
 opacity:0.6;
+}
+
+.sepet-sayi {
+position:absolute;
+top:-8px;
+right:-8px;
+background:#000;
+color:#fff;
+font-size:10px;
+font-weight:700;
+width:18px;
+height:18px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+line-height:1;
 }
 
 .category-bar{
@@ -159,6 +177,21 @@ display:flex;
 
 <body>
 
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$girisYapildi = isset($_SESSION['kullanici_id']);
+
+// Sepet sayacı
+$sepetSayi = 0;
+if (!empty($_SESSION['sepet'])) {
+    foreach ($_SESSION['sepet'] as $urun) {
+        $sepetSayi += (int)$urun['adet'];
+    }
+}
+?>
+
 <header class="header" id="header">
 
 <button class="menu-toggle"> 
@@ -186,8 +219,8 @@ display:flex;
     <a href="favoriler.php">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
             <path d="M12 21s-7-4.5-9-8.5C1 8 3.5 5 6.5 5c2 0 3.5 1.5 5.5 3.5C14 6.5 15.5 5 17.5 5 20.5 5 23 8 21 12.5 19 16.5 12 21 12 21z"/>
-</svg>
-</a>
+        </svg>
+    </a>
 
     <a href="sepet.php">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
@@ -195,45 +228,50 @@ display:flex;
             <circle cx="9" cy="21" r="1"></circle>
             <circle cx="18" cy="21" r="1"></circle>
         </svg>
+        <?php if ($sepetSayi > 0): ?>
+            <span class="sepet-sayi"><?php echo $sepetSayi; ?></span>
+        <?php endif; ?>
     </a>
 
-    <a href="giris.php">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="12" cy="7" r="4"></circle>
-            <path d="M5.5 21a8.38 8.38 0 0 1 13 0"></path>
-        </svg>
-    </a>
-
-
+    <?php if ($girisYapildi): ?>
+        <a href="profil.php" title="Profil">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="7" r="4"></circle>
+                <path d="M5.5 21a8.38 8.38 0 0 1 13 0"></path>
+            </svg>
+        </a>
+    <?php else: ?>
+        <a href="giris.php" title="Giriş Yap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="7" r="4"></circle>
+                <path d="M5.5 21a8.38 8.38 0 0 1 13 0"></path>
+            </svg>
+        </a>
+    <?php endif; ?>
 
 </div>
 
 </header>
 
 <nav class="category-bar">
-
-<a href="sayfalist.php">Kazak</a>
-<a href="sayfalist.php">Gömlek</a>
-<a href="sayfalist.php">Elbise</a>
-<a href="sayfalist.php">Tişört</a>
-<a href="sayfalist.php">Top | Body</a>
-<a href="sayfalist.php">Etek</a>
-<a href="sayfalist.php">Şort</a>
-
+    <a href="sayfalist.php?kategori=kazak">Kazak</a>
+    <a href="sayfalist.php?kategori=gomlek">Gömlek</a>
+    <a href="sayfalist.php?kategori=elbiseler">Elbise</a>
+    <a href="sayfalist.php?kategori=tisortler">Tişört</a>
+    <a href="sayfalist.php?kategori=toplar">Top | Body</a>
+    <a href="sayfalist.php?kategori=etek">Etek</a>
+    <a href="sayfalist.php?kategori=sortlar">Şort</a>
 </nav>
 
 <nav class="mobile-menu" id="mobileMenu">
-
-<h3 class="menu-title">Kategoriler</h3>
-
-<a href="sayfalist.php">Kazak</a>
-<a href="sayfalist.php">Gömlek</a>
-<a href="sayfalist.php">Elbise</a>
-<a href="sayfalist.php">Tişört</a>
-<a href="sayfalist.php">Top | Body</a>
-<a href="sayfalist.php">Etek</a>
-<a href="sayfalist.php">Şort</a>
-
+    <h3 class="menu-title">Kategoriler</h3>
+    <a href="sayfalist.php?kategori=kazak">Kazak</a>
+    <a href="sayfalist.php?kategori=gomlek">Gömlek</a>
+    <a href="sayfalist.php?kategori=elbiseler">Elbise</a>
+    <a href="sayfalist.php?kategori=tisortler">Tişört</a>
+    <a href="sayfalist.php?kategori=toplar">Top | Body</a>
+    <a href="sayfalist.php?kategori=etek">Etek</a>
+    <a href="sayfalist.php?kategori=sortlar">Şort</a>
 </nav>
 
 <script>
@@ -252,11 +290,9 @@ mobileMenu.classList.toggle("active");
 });
 
 document.addEventListener("click", function(e){
-
 if (!mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
 mobileMenu.classList.remove("active");
 }
-
 });
 
 </script>

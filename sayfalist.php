@@ -1,18 +1,36 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 include 'config.php';
 
-$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$currentCategory = isset($_GET['kategori']) ? $_GET['kategori'] : 'tum';
 
-$stmt = $pdo->prepare('SELECT * FROM urunler WHERE id = ?');
-$stmt->execute([$id]);
-$urun = $stmt->fetch(PDO::FETCH_ASSOC);
+$categories = [
+    'tum'       => 'Tüm Ürünler',
+    'elbiseler' => 'Elbiseler',
+    'ceketler'  => 'Ceketler',
+    'toplar'    => 'Toplar',
+    'bodyler'   => 'Bodyler',
+    'sortlar'   => 'Şortlar',
+    'tisortler' => 'Tişörtler',
+    'etek'      => 'Etekler',
+    'gomlek'    => 'Gömlekler',
+    'kazak'     => 'Kazaklar',
+];
 
-if (!$urun) {
-    header('Location: 404.php');
-    exit;
+if ($currentCategory !== 'tum') {
+    $stmt = $pdo->prepare('SELECT * FROM urunler WHERE kategori = ?');
+    $stmt->execute([$currentCategory]);
+} else {
+    $stmt = $pdo->query('SELECT * FROM urunler');
 }
 
-include "header.php";
+$urunler = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$pageTitle = isset($categories[$currentCategory]) ? $categories[$currentCategory] : $categories['tum'];
+
+include 'header.php';
 ?>
 
 <style>
@@ -23,6 +41,8 @@ include "header.php";
         --accent-dark: #8b6a2b;
         --border-color: #e6e6e6;
         --muted-text: #666666;
+        --badge-bg: #000000;
+        --badge-text: #ffffff;
         --heart-active: #e63946;
     }
 
@@ -32,272 +52,268 @@ include "header.php";
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    .page-wrapper {
-        max-width: 1180px;
-        margin: 0 auto;
-        padding: 24px 16px 40px;
-    }
+    .pb-collection-header { margin-bottom: 1.5rem; }
 
-    .breadcrumb {
-        font-size: .8rem;
-        color: var(--muted-text);
-        margin-bottom: 12px;
-    }
-
-    .breadcrumb a {
-        color: var(--muted-text);
-        text-decoration: none;
-    }
-
-    .breadcrumb a:hover { text-decoration: underline; }
-
-    .gallery-main {
-        position: relative;
-        border-radius: 10px;
-        overflow: hidden;
-        background: #f5f5f5;
-        aspect-ratio: 3 / 4;
-    }
-
-    .gallery-main img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-
-    .gallery-thumbs {
-        display: flex;
-        gap: 8px;
-        margin-top: 10px;
-    }
-
-    .gallery-thumb {
-        flex: 1;
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1px solid transparent;
-        cursor: pointer;
-        background: #f5f5f5;
-        aspect-ratio: 3 / 4;
-    }
-
-    .gallery-thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-
-    .gallery-thumb.active { border-color: #000; }
-
-    .product-title {
-        font-size: 1.4rem;
+    .pb-collection-title {
+        font-size: 1.75rem;
         font-weight: 600;
-        margin-bottom: .25rem;
+        letter-spacing: .15em;
+        text-transform: uppercase;
     }
 
-    .product-price {
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin-bottom: .1rem;
+    .pb-collection-subtitle {
+        font-size: .9rem;
+        color: var(--muted-text);
     }
 
-    .size-label { font-size: .85rem; margin-bottom: .3rem; }
-
-    .size-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: .35rem;
-        margin-bottom: .75rem;
-    }
-
-    .size-btn {
-        min-width: 44px;
-        padding: .35rem .5rem;
-        border-radius: 0;
+    .pb-product-card {
+        border-radius: .75rem;
         border: 1px solid var(--border-color);
+        padding: .6rem;
         background-color: #fff;
-        font-size: .8rem;
-        cursor: pointer;
-    }
-
-    .size-btn:hover { border-color: #000; }
-
-    .size-btn.active {
-        border-color: #000;
-        background-color: #000;
-        color: #fff;
-    }
-
-    .size-help {
-        font-size: .8rem;
-        color: var(--muted-text);
-        margin-bottom: 1rem;
-    }
-
-    .action-row {
+        overflow: hidden;
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        height: 100%;
         display: flex;
-        gap: .5rem;
-        margin-bottom: .75rem;
+        flex-direction: column;
     }
 
-    .btn-add-to-cart {
-        flex: 1;
+    .pb-product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 35px rgba(0,0,0,.06);
+        border-color: rgba(0,0,0,.08);
+    }
+
+    .pb-image-wrapper {
+        position: relative;
+        border-radius: .6rem;
+        overflow: hidden;
+        background: #f5f5f5;
+        aspect-ratio: 3 / 4;
+    }
+
+    .pb-image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .4s ease;
+    }
+
+    .pb-product-card:hover .pb-image-wrapper img { transform: scale(1.05); }
+
+    .pb-actions-top {
+        position: absolute;
+        top: .5rem;
+        right: .5rem;
+        display: flex;
+        flex-direction: column;
+        gap: .3rem;
+        z-index: 3;
+    }
+
+    .pb-icon-btn {
+        width: 32px;
+        height: 32px;
         border-radius: 999px;
         border: none;
-        padding: .6rem 1.2rem;
-        font-size: .8rem;
-        text-transform: uppercase;
-        letter-spacing: .15em;
-        background-color: #7a90a8;
-        color: #fff;
-        cursor: pointer;
-    }
-
-    .btn-add-to-cart:hover { opacity: 0.9; }
-
-    .btn-fav {
-        width: 42px;
-        border-radius: 999px;
-        border: 1px solid var(--border-color);
-        background-color: #fff;
-        cursor: pointer;
+        background-color: rgba(255,255,255,.92);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background-color .15s ease, transform .15s ease, box-shadow .15s ease;
+        font-size: 1rem;
     }
 
-    .btn-fav.active {
-        border-color: var(--heart-active);
-        color: var(--heart-active);
+    .pb-icon-btn:hover {
+        background-color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(0,0,0,.18);
     }
 
-    .delivery-info,
-    .product-description,
-    .care-info {
-        font-size: .85rem;
+    .pb-heart { color: #888; }
+    .pb-heart.active { color: var(--heart-active); }
+
+    .pb-hover-panel {
+        position: absolute;
+        left: 0; right: 0; bottom: -80px;
+        padding: .5rem .6rem;
+        background-color: rgba(255,255,255,.96);
+        display: flex;
+        gap: .4rem;
+        align-items: center;
+        transition: bottom .25s ease;
+        z-index: 2;
+    }
+
+    .pb-product-card:hover .pb-hover-panel { bottom: 0; }
+
+    @media (max-width: 768px) { .pb-hover-panel { bottom: 0; } }
+
+    .pb-size-select {
+        flex: 1;
+        border-radius: 0;
+        border: 1px solid #000;
+        font-size: .8rem;
+        padding: .35rem .45rem;
+    }
+
+    .pb-hover-add {
+        border: none;
+        background-color: #000;
+        color: #fff;
+        font-size: .8rem;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        padding: .4rem .9rem;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    .pb-hover-add:hover { background-color: #111; }
+
+    .pb-info {
+        padding: .25rem .25rem .2rem;
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+        flex-grow: 1;
+    }
+
+    .pb-name { font-size: .9rem; font-weight: 500; }
+
+    .pb-price-row {
+        display: flex;
+        align-items: baseline;
+        gap: .4rem;
+    }
+
+    .pb-price { font-size: .95rem; font-weight: 600; }
+
+    .pb-meta {
+        font-size: .7rem;
         color: var(--muted-text);
-        margin-bottom: .7rem;
+        text-transform: uppercase;
+        letter-spacing: .15em;
     }
 
-    .delivery-info strong,
-    .product-description strong,
-    .care-info strong {
+    .pb-actions-bottom .btn {
+        border-radius: 999px;
+        font-size: .7rem;
+        text-transform: uppercase;
+        letter-spacing: .12em;
+    }
+
+    .pb-scroll-top {
+        position: fixed;
+        right: 18px; bottom: 18px;
+        width: 40px; height: 40px;
+        border: 1px solid #000;
+        background-color: #fff;
         color: #000;
-        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 1040;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .2s ease;
     }
 
-    .stok-uyari {
-        font-size: .85rem;
-        color: #e63946;
-        margin-bottom: .75rem;
-    }
-
-    @media (max-width: 768px) {
-        .page-wrapper { padding-top: 16px; }
-        .product-title { margin-top: 12px; }
-    }
+    .pb-scroll-top.visible { opacity: 1; pointer-events: auto; }
+    .pb-scroll-top span { font-size: 1.1rem; line-height: 1; }
 </style>
 
-<div class="page-wrapper">
-    <nav class="breadcrumb">
-        <a href="sayfalist.php">Ürünler</a> / <?= htmlspecialchars($urun['ad']) ?>
-    </nav>
+<div class="container py-4">
+    <div class="pb-collection-header">
+        <h1 class="pb-collection-title mb-1"><?php echo htmlspecialchars($pageTitle); ?></h1>
+        <p class="pb-collection-subtitle mb-0"></p>
+    </div>
 
-    <div class="row g-4">
-        <div class="col-12 col-md-7">
-            <div class="gallery-main" id="mainImage">
-                <img src="images/<?= htmlspecialchars($urun['gorsel']) ?>" alt="<?= htmlspecialchars($urun['ad']) ?>">
-            </div>
-
-            <div class="gallery-thumbs mt-2">
-                <div class="gallery-thumb active" data-image="images/<?= htmlspecialchars($urun['gorsel']) ?>">
-                    <img src="images/<?= htmlspecialchars($urun['gorsel']) ?>" alt="">
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-5">
-            <h1 class="product-title"><?= htmlspecialchars($urun['ad']) ?></h1>
-
-            <div class="product-price"><?= number_format($urun['fiyat'], 2, ',', '.') ?> TL</div>
-
-            <?php if ((int)$urun['stok'] === 0): ?>
-                <div class="stok-uyari">⚠ Bu ürün stokta bulunmamaktadır.</div>
-            <?php elseif ((int)$urun['stok'] <= 3): ?>
-                <div class="stok-uyari">Son <?= (int)$urun['stok'] ?> ürün kaldı!</div>
-            <?php endif; ?>
-
-            <div class="size-label">Beden seçin</div>
-            <div class="size-grid" id="sizeGrid">
-                <button class="size-btn" data-size="XS">XS</button>
-                <button class="size-btn" data-size="S">S</button>
-                <button class="size-btn" data-size="M">M</button>
-                <button class="size-btn" data-size="L">L</button>
-                <button class="size-btn" data-size="XL">XL</button>
-            </div>
-            <div class="size-help">
-                <a href="#" style="color:#000; text-decoration:underline; font-size:.8rem;">Beden rehberi</a>
-            </div>
-
-            <div class="action-row">
-                <button class="btn-add-to-cart" id="addToCartBtn" <?= (int)$urun['stok'] === 0 ? 'disabled' : '' ?>>
-                    <?= (int)$urun['stok'] === 0 ? 'Stokta Yok' : 'Sepete ekle' ?>
-                </button>
-                <button class="btn-fav" id="favBtn" aria-label="Favorilere ekle"
-                    data-product-id="<?= $urun['id'] ?>"
-                    data-product-name="<?= htmlspecialchars($urun['ad']) ?>"
-                    data-product-price="<?= htmlspecialchars($urun['fiyat']) ?>"
-                    data-product-image="<?= htmlspecialchars($urun['gorsel']) ?>"
-                    data-product-category="<?= htmlspecialchars($urun['kategori']) ?>">
-                    ♥
-                </button>
-            </div>
-
-            <div class="delivery-info">
-                <strong>Teslimat:</strong> Standart gönderim 2-5 iş günü içinde gerçekleşmektedir.
-            </div>
-
-            <?php if (!empty($urun['aciklama'])): ?>
-            <div class="product-description">
-                <strong>Ürün açıklaması:</strong> <?= htmlspecialchars($urun['aciklama']) ?>
-            </div>
-            <?php endif; ?>
-
-            <div class="care-info">
-                <strong>Bakım talimatları:</strong> Benzer renklerle 30°C'de yıkayın, ters çevirerek ütüleyin.
-            </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <div class="small text-muted">
+            <?php echo count($urunler); ?> ürün gösteriliyor
         </div>
     </div>
+
+    <?php if (empty($urunler)): ?>
+        <p class="text-muted small">Bu kategori için henüz ürün eklenmedi.</p>
+    <?php else: ?>
+        <div class="row g-3 g-md-4">
+            <?php foreach ($urunler as $urun): ?>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="pb-product-card"
+                         data-product-id="<?php echo (int)$urun['id']; ?>"
+                         data-product-name="<?php echo htmlspecialchars($urun['ad'], ENT_QUOTES); ?>"
+                         data-product-price="<?php echo htmlspecialchars((string)$urun['fiyat'], ENT_QUOTES); ?>"
+                         data-product-image="<?php echo htmlspecialchars($urun['gorsel'], ENT_QUOTES); ?>"
+                         data-product-category="<?php echo htmlspecialchars($urun['kategori'], ENT_QUOTES); ?>">
+
+                        <div class="pb-image-wrapper">
+                            <img
+                                src="images/<?php echo htmlspecialchars($urun['gorsel']); ?>"
+                                alt="<?php echo htmlspecialchars($urun['ad']); ?>"
+                            >
+
+                            <div class="pb-actions-top">
+                                <button class="pb-icon-btn js-fav" type="button" aria-label="Favorilere ekle">
+                                    <span class="pb-heart">&hearts;</span>
+                                </button>
+                            </div>
+
+                            <div class="pb-hover-panel">
+                                <select class="form-select pb-size-select">
+                                    <option value="">Beden seç</option>
+                                    <option value="XS">XS</option>
+                                    <option value="S">S</option>
+                                    <option value="M">M</option>
+                                    <option value="L">L</option>
+                                    <option value="XL">XL</option>
+                                </select>
+                                <button class="pb-hover-add js-hover-add" type="button">Ekle</button>
+                            </div>
+                        </div>
+
+                        <div class="pb-info">
+                            <div class="pb-name"><?php echo htmlspecialchars($urun['ad']); ?></div>
+
+                            <div class="pb-price-row">
+                                <div class="pb-price">
+                                    <?php echo number_format($urun['fiyat'], 2, ',', '.'); ?> TL
+                                </div>
+                            </div>
+
+                            <div class="pb-meta">
+                                <?php echo strtoupper($urun['kategori']); ?> • Özel dikim
+                            </div>
+
+                            <div class="pb-actions-bottom mt-2">
+                                <button class="btn btn-outline-dark w-100 js-quick-view" type="button">
+                                    İncele
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 </div>
 
+<button class="pb-scroll-top" id="scrollTopBtn" aria-label="Yukarı çık">
+    <span>&uarr;</span>
+</button>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"
+></script>
+
 <script>
-    document.querySelectorAll('.gallery-thumb').forEach(function (thumb) {
-        thumb.addEventListener('click', function () {
-            const src = this.getAttribute('data-image');
-            document.querySelector('#mainImage img').src = src;
-            document.querySelectorAll('.gallery-thumb').forEach(function (t) {
-                t.classList.remove('active');
-            });
-            this.classList.add('active');
-        });
-    });
-
-    let selectedSize = '';
-    document.querySelectorAll('.size-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            document.querySelectorAll('.size-btn').forEach(function (b) {
-                b.classList.remove('active');
-            });
-            this.classList.add('active');
-            selectedSize = this.getAttribute('data-size');
-        });
-    });
-
     const FAV_KEY = 'megay_favorites';
-    const favBtn = document.getElementById('favBtn');
 
     function getFavorites() {
         try {
@@ -326,29 +342,52 @@ include "header.php";
         list.unshift(product); saveFavorites(list); return true;
     }
 
-    const detailProduct = {
-        id: favBtn.getAttribute('data-product-id'),
-        name: favBtn.getAttribute('data-product-name'),
-        price: parseFloat(favBtn.getAttribute('data-product-price') || '0'),
-        image: favBtn.getAttribute('data-product-image'),
-        category: favBtn.getAttribute('data-product-category'),
-        url: 'urun-detay.php?id=' + (favBtn.getAttribute('data-product-id') || '')
-    };
+    document.querySelectorAll('.js-fav').forEach(function (btn) {
+        const card = btn.closest('.pb-product-card');
+        const heart = btn.querySelector('.pb-heart');
+        const productId = card.getAttribute('data-product-id');
+        const productData = {
+            id: productId,
+            name: card.getAttribute('data-product-name') || '',
+            price: parseFloat(card.getAttribute('data-product-price') || '0'),
+            image: card.getAttribute('data-product-image') || '',
+            category: card.getAttribute('data-product-category') || '',
+            url: 'urun-detay.php?id=' + productId
+        };
 
-    if (isFavorite(detailProduct.id)) { favBtn.classList.add('active'); }
+        if (isFavorite(productId)) { heart.classList.add('active'); }
 
-    favBtn.addEventListener('click', function () {
-        const added = toggleFavorite(detailProduct);
-        this.classList.toggle('active', added);
+        btn.addEventListener('click', function () {
+            const added = toggleFavorite(productData);
+            heart.classList.toggle('active', added);
+        });
     });
 
-    document.getElementById('addToCartBtn').addEventListener('click', function () {
-        if (!selectedSize) {
-            alert('Lütfen bir beden seçin.');
-            return;
-        }
-        alert('Ürün sepete eklendi. Beden: ' + selectedSize);
+    document.querySelectorAll('.js-hover-add').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const card = this.closest('.pb-product-card');
+            const select = card.querySelector('.pb-size-select');
+            const size = select.value;
+            if (!size) { alert('Lütfen beden seçiniz.'); return; }
+            alert('Ürün sepete eklendi. Beden: ' + size);
+        });
+    });
+
+    document.querySelectorAll('.js-quick-view').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const card = this.closest('.pb-product-card');
+            const productId = card.getAttribute('data-product-id');
+            window.location.href = 'urun-detay.php?id=' + productId;
+        });
+    });
+
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', function () {
+        scrollBtn.classList.toggle('visible', window.scrollY > 250);
+    });
+    scrollBtn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 </script>
 
-<?php include "footer.php"; ?>
+<?php include 'footer.php'; ?>

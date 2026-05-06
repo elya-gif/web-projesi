@@ -318,7 +318,7 @@ $grand_total = $subtotal + $shipping_estimate;
                          data-product-price="<?php echo htmlspecialchars((string)$item['price'], ENT_QUOTES, 'UTF-8'); ?>"
                          data-product-image="<?php echo htmlspecialchars($item['image'], ENT_QUOTES, 'UTF-8'); ?>">
                         <div class="cart-item-img-wrap">
-                            <img src="<?php echo htmlspecialchars($item['image']); ?>" alt="">
+                            <img src="images/<?php echo htmlspecialchars($item['image']); ?>" alt="">
                             <button type="button" class="cart-item-fav" aria-label="Favori">♡</button>
                         </div>
                         <div class="cart-item-body">
@@ -450,23 +450,42 @@ $grand_total = $subtotal + $shipping_estimate;
 
         plus.addEventListener('click', function () {
             var q = parseInt(valEl.textContent, 10) + 1;
+            var pid = row.getAttribute('data-product-id');
             valEl.textContent = q;
             recalc();
+            fetch('sepet-guncelle.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'urun_id=' + pid + '&adet=' + q
+            });
         });
+
         minus.addEventListener('click', function () {
             var q = parseInt(valEl.textContent, 10) - 1;
-            if (q < 1) {
-                q = 1;
-            }
+            var pid = row.getAttribute('data-product-id');
+            if (q < 1) { q = 1; }
             valEl.textContent = q;
             recalc();
+            fetch('sepet-guncelle.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'urun_id=' + pid + '&adet=' + q
+            });
         });
+
         remove.addEventListener('click', function () {
-            row.remove();
-            if (!document.querySelector('.cart-item')) {
-                location.reload();
-            }
-            recalc();
+            var pid = row.getAttribute('data-product-id');
+            fetch('sepet-sil.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'urun_id=' + pid
+            }).then(function () {
+                row.remove();
+                if (!document.querySelector('.cart-item')) {
+                    location.reload();
+                }
+                recalc();
+            });
         });
 
         if (favBtn) {
