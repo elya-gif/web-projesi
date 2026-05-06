@@ -3,6 +3,37 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+include 'config.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['kullanici_id'])) {
+    $sepet = $_SESSION['sepet'] ?? [];
+
+    if (!empty($sepet)) {
+        $kullanici_id = $_SESSION['kullanici_id'];
+        $adres = trim($_POST['adres'] . ' ' . $_POST['ilce'] . ' ' . $_POST['il']);
+
+        $toplam = 0;
+        foreach ($sepet as $urun) {
+            $toplam += $urun['fiyat'] * $urun['adet'];
+        }
+        $toplam += 49.90;
+
+        $stmt = $pdo->prepare('INSERT INTO siparisler (kullanici_id, toplam, durum) VALUES (?, ?, ?)');
+        $stmt->execute([$kullanici_id, $toplam, 'bekliyor']);
+        $siparis_id = $pdo->lastInsertId();
+
+        foreach ($sepet as $urun) {
+            $stmt = $pdo->prepare('INSERT INTO siparis_urunler (siparis_id, urun_id, adet, fiyat) VALUES (?, ?, ?, ?)');
+            $stmt->execute([$siparis_id, $urun['id'], $urun['adet'], $urun['fiyat']]);
+        }
+
+        $_SESSION['sepet'] = [];
+
+        header('Location: siparis-onay.php?siparis_id=' . $siparis_id);
+        exit;
+    }
+}
+
 $isLoggedIn = isset($_SESSION['user_id']) || isset($_SESSION['uye']);
 $mode = $_GET['mod'] ?? '';
 
@@ -240,7 +271,7 @@ include "header.php";
             <?php endif; ?>
         </p>
 
-        <form action="odeme-tamamla.php" method="post">
+        <form action="odeme.php" method="post">
             <div class="row g-4">
                 <div class="col-lg-8">
                     <section class="checkout-card">
