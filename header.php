@@ -29,16 +29,14 @@ font-family: Arial, sans-serif;
 }
 
 .header{
-position:fixed;
-top:0;
-width:100%;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:50px 40px;
-z-index:1000;
-background:transparent;
-transition:0.3s ease;
+    position:fixed;
+    top:0;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:20px 40px;
+    z-index:1000;
 }
 
 .header.scrolled{
@@ -47,7 +45,7 @@ box-shadow:0 4px 15px rgba(0,0,0,0.05);
 }
 
 .menu-toggle{
-position:absolute;
+position:static;
 left:40px;
 display:none;
 align-items:center;
@@ -60,9 +58,10 @@ border:none;
 }
 
 .logo{
-position:absolute;
-left:50%;
-transform:translateX(-50%);
+position:static;
+flex:1;
+display:flex;
+justify-content:center;
 }
 
 .logo a{
@@ -74,21 +73,15 @@ font-weight:600;
 color:#1C1C1C;
 }
 
-.nav-icons{
-position:absolute;
+.nav-icons{ 
+position:static;
 right:40px;
 display:flex;
 align-items:center;
 gap:20px;
+height:24px; 
 }
 
-.nav-icons a{
-text-decoration:none;
-color:#1C1C1C;
-font-size:22px;
-transition:0.3s;
-position:relative;
-}
 
 .nav-icons a:hover{
 opacity:0.6;
@@ -147,6 +140,76 @@ padding:20px 25px;
 border-bottom:1px solid #ddd;
 margin-bottom:10px;
 background:#EAE6E0;
+}
+
+
+.search-container{
+display:flex;
+align-items:center;
+height:24px;
+}
+#searchBtn{
+display:flex;
+align-items:center;
+justify-content:center;
+padding:0;
+margin:0;
+line-height:1;
+}
+
+#searchBtn svg{
+display:block;
+}
+
+.search-box{
+width:0;
+opacity:0;
+overflow:hidden;
+transition:0.4s ease;
+}
+
+.search-box input{
+border:none;
+outline:none;
+background:transparent;
+border-bottom:1px solid #000;
+padding:5px 10px;
+width:220px;
+font-size:15px;
+}
+
+.search-container{
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.nav-icons a{
+width:24px;
+height:24px;
+display:flex;
+align-items:center;
+justify-content:center;
+text-decoration:none;
+color:#1C1C1C;
+transition:0.3s;
+position:relative;
+}
+
+.nav-icons svg{
+width:22px;
+height:22px;
+display:block;
+}
+
+.nav-icons.active .search-box{
+width:230px;
+opacity:1;
+margin-left:10px;
+}
+
+.nav-icons.active > a{
+display:none;
 }
 
 .mobile-menu a{
@@ -209,12 +272,22 @@ if (!empty($_SESSION['sepet'])) {
 
 <div class="nav-icons">
 
-    <a href="#">
+    <div class="search-container">
+
+    <a href="#" id="searchBtn">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
     </a>
+
+   <div class="search-box">
+    <form action="arama.php" method="GET">
+        <input type="text" name="q" placeholder="Ürün ara...">
+    </form>
+</div>
+    
+</div>
 
     <a href="favoriler.php">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24">
@@ -256,7 +329,7 @@ if (!empty($_SESSION['sepet'])) {
 <nav class="category-bar">
     <a href="sayfalist.php?kategori=kazak">Kazak</a>
     <a href="sayfalist.php?kategori=gomlek">Gömlek</a>
-    <a href="sayfalist.php?kategori=elbiseler">Elbise</a>
+    <a href="sayfalist.php?kategori=elbise">Elbise</a>
     <a href="sayfalist.php?kategori=tisortler">Tişört</a>
     <a href="sayfalist.php?kategori=toplar">Top | Body</a>
     <a href="sayfalist.php?kategori=etek">Etek</a>
@@ -267,7 +340,7 @@ if (!empty($_SESSION['sepet'])) {
     <h3 class="menu-title">Kategoriler</h3>
     <a href="sayfalist.php?kategori=kazak">Kazak</a>
     <a href="sayfalist.php?kategori=gomlek">Gömlek</a>
-    <a href="sayfalist.php?kategori=elbiseler">Elbise</a>
+    <a href="sayfalist.php?kategori=elbise">Elbise</a>
     <a href="sayfalist.php?kategori=tisortler">Tişört</a>
     <a href="sayfalist.php?kategori=toplar">Top | Body</a>
     <a href="sayfalist.php?kategori=etek">Etek</a>
@@ -275,6 +348,26 @@ if (!empty($_SESSION['sepet'])) {
 </nav>
 
 <script>
+
+const searchBtn = document.getElementById("searchBtn");
+const navIcons = document.querySelector(".nav-icons");
+
+searchBtn.addEventListener("click", function(e){
+e.preventDefault();
+navIcons.classList.toggle("active");
+if (navIcons.classList.contains("active")) {
+    document.querySelector(".search-box input").focus();
+}
+});
+
+document.querySelector(".search-box input").addEventListener("keypress", function(e){
+if (e.key === "Enter") {
+    const q = this.value.trim();
+    if (q) {
+        window.location.href = "arama.php?q=" + encodeURIComponent(q);
+    }
+}
+});
 
 window.addEventListener("scroll", function(){
 const header = document.getElementById("header");
