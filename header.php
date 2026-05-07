@@ -249,8 +249,8 @@ $girisYapildi = isset($_SESSION['kullanici_id']);
 // Sepet sayacı
 $sepetSayi = 0;
 if (!empty($_SESSION['sepet'])) {
-    foreach ($_SESSION['sepet'] as $urun) {
-        $sepetSayi += (int)$urun['adet'];
+    foreach ($_SESSION['sepet'] as $sepet_item) {
+        $sepetSayi += (int)$sepet_item['adet'];
     }
 }
 ?>
@@ -329,7 +329,7 @@ if (!empty($_SESSION['sepet'])) {
 <nav class="category-bar">
     <a href="sayfalist.php?kategori=kazak">Kazak</a>
     <a href="sayfalist.php?kategori=gomlek">Gömlek</a>
-    <a href="sayfalist.php?kategori=elbise">Elbise</a>
+    <a href="sayfalist.php?kategori=elbiseler">Elbise</a>
     <a href="sayfalist.php?kategori=tisortler">Tişört</a>
     <a href="sayfalist.php?kategori=toplar">Top | Body</a>
     <a href="sayfalist.php?kategori=etek">Etek</a>
@@ -340,7 +340,7 @@ if (!empty($_SESSION['sepet'])) {
     <h3 class="menu-title">Kategoriler</h3>
     <a href="sayfalist.php?kategori=kazak">Kazak</a>
     <a href="sayfalist.php?kategori=gomlek">Gömlek</a>
-    <a href="sayfalist.php?kategori=elbise">Elbise</a>
+    <a href="sayfalist.php?kategori=elbiseler">Elbise</a>
     <a href="sayfalist.php?kategori=tisortler">Tişört</a>
     <a href="sayfalist.php?kategori=toplar">Top | Body</a>
     <a href="sayfalist.php?kategori=etek">Etek</a>
