@@ -6,5 +6,7 @@
             "email": "yagmurealtun@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "iyzico/iyzipay-php": "^2.0"
+    }
 }
