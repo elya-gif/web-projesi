@@ -64,7 +64,7 @@ if (!$odeme_basarili) {
                         Hata: <?php echo htmlspecialchars($result->getErrorMessage(), ENT_QUOTES, 'UTF-8'); ?>
                     <?php endif; ?>
                 </p>
-                <a href="odeme.php" class="btn-back">Tekrar dene</a>
+                <a href="anasayfa.php" class="btn-back">Anasayfaya dön</a>
             </section>
         </div>
     </main>
@@ -201,7 +201,7 @@ include "header.php";
             <?php endif; ?>
 
             <div class="mt-3">
-                <a href="siparislerim.php" class="btn-orders">Siparişlerime git</a>
+                <a href="anasayfa.php" class="btn-orders">Anasayfaya dön</a>
             </div>
         </section>
     </div>
