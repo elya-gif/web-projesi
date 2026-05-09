@@ -314,6 +314,49 @@ include "header.php";
             <?php endif; ?>
         </p>
 
+        <?php if ($form_html): ?>
+            <div class="row g-4">
+                <div class="col-lg-8 order-2 order-lg-1">
+                    <section class="checkout-card">
+                        <h2 class="section-head">Ödeme</h2>
+                        <div id="iyzipay-checkout-form" class="responsive"></div>
+                        <?= $form_html ?>
+                    </section>
+                </div>
+                <div class="col-lg-4 order-1 order-lg-2">
+                    <aside class="order-summary">
+                        <h2 class="section-head">Siparis ozeti</h2>
+                        <?php foreach ($cartItems as $item): ?>
+                            <div class="order-item">
+                                <div class="order-item-name">
+                                    <?php echo htmlspecialchars((string) $item["name"], ENT_QUOTES, "UTF-8"); ?>
+                                </div>
+                                <div class="order-item-meta">
+                                    Adet: <?php echo (int) $item["qty"]; ?> | Beden:
+                                    <?php echo htmlspecialchars((string) $item["size"], ENT_QUOTES, "UTF-8"); ?> | Renk:
+                                    <?php echo htmlspecialchars((string) $item["color"], ENT_QUOTES, "UTF-8"); ?>
+                                </div>
+                                <div class="order-item-price">
+                                    <?php echo trPrice($item["price"] * $item["qty"]); ?> TL
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                        <div class="sum-row">
+                            <span>Siparis bedeli</span>
+                            <span><?php echo trPrice($subtotal); ?> TL</span>
+                        </div>
+                        <div class="sum-row">
+                            <span>Teslimat</span>
+                            <span><?php echo trPrice($shipping); ?> TL</span>
+                        </div>
+                        <div class="sum-row sum-total">
+                            <span>Toplam</span>
+                            <span><?php echo trPrice($grandTotal); ?> TL</span>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        <?php else: ?>
         <form action="odeme.php" method="post">
             <input type="hidden" name="mod" value="<?php echo htmlspecialchars($mode, ENT_QUOTES, 'UTF-8'); ?>">
             <div class="row g-4">
@@ -323,15 +366,13 @@ include "header.php";
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="odeme-label" for="ad_soyad">Ad Soyad</label>
-                                <input class="odeme-input"
-                                    id="ad_soyad" name="ad_soyad" type="text"
+                                <input class="odeme-input" id="ad_soyad" name="ad_soyad" type="text"
                                     value="<?php echo htmlspecialchars((string) $formValues["ad_soyad"], ENT_QUOTES, "UTF-8"); ?>"
                                     required>
                             </div>
                             <div class="col-md-6">
                                 <label class="odeme-label" for="email">E-posta</label>
-                                <input class="odeme-input" id="email"
-                                    name="email" type="email"
+                                <input class="odeme-input" id="email" name="email" type="email"
                                     value="<?php echo htmlspecialchars((string) $formValues["email"], ENT_QUOTES, "UTF-8"); ?>"
                                     required>
                             </div>
@@ -380,13 +421,7 @@ include "header.php";
                         </div>
                     <?php endif; ?>
 
-                    <?php if ($form_html): ?>
-                        <section class="checkout-card">
-                            <h2 class="section-head">Ödeme</h2>
-                            <div id="iyzipay-checkout-form" class="responsive"></div>
-                            <?= $form_html ?>
-                        </section>
-                    <?php elseif ($sepetDolu): ?>
+                    <?php if ($sepetDolu): ?>
                         <input type="hidden" name="payment_provider" value="iyzico">
                         <button type="submit" class="btn-odeme">Güvenli ödemeye geç</button>
                     <?php else: ?>
@@ -431,6 +466,7 @@ include "header.php";
                 </div>
             </div>
         </form>
+        <?php endif; ?>
     </div>
 </main>
 
