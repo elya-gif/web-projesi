@@ -93,9 +93,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $isLoggedIn = isset($_SESSION['user_id']) || isset($_SESSION['uye']);
-$mode = $_GET['mod'] ?? '';
+$mode = $_GET['mod'] ?? $_POST['mod'] ?? '';
 
-if (!$isLoggedIn && $mode !== 'misafir') {
+if (!$isLoggedIn && $mode !== 'misafir' && $mode !== 'uye') {
     header("Location: odeme-kontrol.php");
     exit;
 }
@@ -316,6 +316,7 @@ include "header.php";
         </p>
 
         <form action="odeme.php" method="post">
+            <input type="hidden" name="mod" value="<?php echo htmlspecialchars($mode, ENT_QUOTES, 'UTF-8'); ?>">
             <div class="row g-4">
                 <div class="col-lg-8 order-2 order-lg-1">
                     <section class="checkout-card">
