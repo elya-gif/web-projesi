@@ -3,9 +3,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'vendor/iyzipay/IyzipayBootstrap.php';
-IyzipayBootstrap::init(__DIR__ . '/vendor/iyzipay/src');
+require_once 'vendor/autoload.php';
 include 'config.php';
+
 
 $form_html = null;
 $hata = null;
