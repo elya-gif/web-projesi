@@ -148,7 +148,7 @@ include 'header.php';
 
     .pb-product-card:hover .pb-hover-panel { bottom: 0; }
 
-    @media (max-width: 768px) { .pb-hover-panel { bottom: 0; } }
+    @media (max-width: 768px) { .pb-hover-panel { bottom: -80px; } }
 
     .pb-size-select {
         flex: 1;
