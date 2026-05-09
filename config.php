@@ -1,9 +1,7 @@
 <?php
 try {
     $pdo = new PDO(
-
         'mysql:host=127.0.0.1;port=8889;dbname=megay_moda;charset=utf8',
-
         'root',
         'root'
     );
@@ -11,4 +9,8 @@ try {
 } catch (PDOException $e) {
     die('Bağlantı hatası: ' . $e->getMessage());
 }
+
+$iyzico_api_key    = 'sandbox-c3xrxzgfsxxw8ENBiqdYbJTynDmsRJ1c';
+$iyzico_secret_key = 'sandbox-bp76DUc3B4OrtouyBNbnRmdsY6RVCeQB';
+$iyzico_base_url   = 'https://sandbox-api.iyzipay.com';
 ?>

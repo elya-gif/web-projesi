@@ -267,7 +267,7 @@ if (!empty($_SESSION['sepet'])) {
 </button>
 
 <div class="logo">
-<a href="#">MEGAY MODA</a>
+<a href="anasayfa.php">MEGAY MODA</a>
 </div>
 
 <div class="nav-icons">

@@ -3,34 +3,92 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once 'vendor/iyzipay/IyzipayBootstrap.php';
+IyzipayBootstrap::init(__DIR__ . '/vendor/iyzipay/src');
 include 'config.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['kullanici_id'])) {
+$form_html = null;
+$hata = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sepet = $_SESSION['sepet'] ?? [];
 
     if (!empty($sepet)) {
-        $kullanici_id = $_SESSION['kullanici_id'];
-        $adres = trim($_POST['adres'] . ' ' . $_POST['ilce'] . ' ' . $_POST['il']);
+        $options = new \Iyzipay\Options();
+        $options->setApiKey($iyzico_api_key);
+        $options->setSecretKey($iyzico_secret_key);
+        $options->setBaseUrl($iyzico_base_url);
 
         $toplam = 0;
         foreach ($sepet as $urun) {
             $toplam += $urun['fiyat'] * $urun['adet'];
         }
         $toplam += 49.90;
+        $toplam_str = number_format($toplam, 2, '.', '');
 
-        $stmt = $pdo->prepare('INSERT INTO siparisler (kullanici_id, toplam, durum) VALUES (?, ?, ?)');
-        $stmt->execute([$kullanici_id, $toplam, 'bekliyor']);
-        $siparis_id = $pdo->lastInsertId();
+        $buyer = new \Iyzipay\Model\Buyer();
+        $buyer->setId('BYR_' . time());
+        $buyer->setName(explode(' ', $_POST['ad_soyad'])[0] ?? 'Ad');
+        $buyer->setSurname(explode(' ', $_POST['ad_soyad'])[1] ?? 'Soyad');
+        $buyer->setEmail($_POST['email']);
+        $buyer->setGsmNumber('+905555555555');
+        $buyer->setIdentityNumber('11111111111');
+        $buyer->setLastLoginDate('2015-10-05 12:43:35');
+        $buyer->setRegistrationDate('2013-04-21 15:12:09');
+        $buyer->setRegistrationAddress($_POST['adres']);
+        $buyer->setIp($_SERVER['REMOTE_ADDR']);
+        $buyer->setCity($_POST['il']);
+        $buyer->setCountry('Turkey');
+        $buyer->setZipCode($_POST['posta_kodu']);
 
-        foreach ($sepet as $urun) {
-            $stmt = $pdo->prepare('INSERT INTO siparis_urunler (siparis_id, urun_id, adet, fiyat) VALUES (?, ?, ?, ?)');
-            $stmt->execute([$siparis_id, $urun['id'], $urun['adet'], $urun['fiyat']]);
+        $adres = new \Iyzipay\Model\Address();
+        $adres->setContactName($_POST['ad_soyad']);
+        $adres->setCity($_POST['il']);
+        $adres->setCountry('Turkey');
+        $adres->setAddress($_POST['adres']);
+        $adres->setZipCode($_POST['posta_kodu']);
+
+        $basketItems = [];
+        foreach ($sepet as $urun_id => $urun) {
+            $item = new \Iyzipay\Model\BasketItem();
+            $item->setId('URN_' . $urun_id);
+            $item->setName($urun['ad'] ?? $urun['name'] ?? 'Urun');
+            $item->setCategory1('Kadin Giyim');
+            $item->setItemType(\Iyzipay\Model\BasketItemType::PHYSICAL);
+            $item->setPrice(number_format($urun['fiyat'] * $urun['adet'], 2, '.', ''));
+            $basketItems[] = $item;
         }
 
-        $_SESSION['sepet'] = [];
+        $kargo = new \Iyzipay\Model\BasketItem();
+        $kargo->setId('KARGO');
+        $kargo->setName('Kargo Ucreti');
+        $kargo->setCategory1('Kargo');
+        $kargo->setItemType(\Iyzipay\Model\BasketItemType::PHYSICAL);
+        $kargo->setPrice('49.90');
+        $basketItems[] = $kargo;
 
-        header('Location: siparis-onay.php?siparis_id=' . $siparis_id);
-        exit;
+        $request = new \Iyzipay\Request\CreateCheckoutFormInitializeRequest();
+        $request->setLocale(\Iyzipay\Model\Locale::TR);
+        $conv_id = 'ODEME_' . time();
+        $request->setConversationId($conv_id);
+        $request->setPrice($toplam_str);
+        $request->setPaidPrice($toplam_str);
+        $request->setCurrency(\Iyzipay\Model\Currency::TL);
+        $request->setEnabledInstallments([1, 2, 3, 6, 9]);
+        $request->setCallbackUrl('http://localhost:8888/web-projesi/siparis-onay.php');
+        $request->setBuyer($buyer);
+        $request->setShippingAddress($adres);
+        $request->setBillingAddress($adres);
+        $request->setBasketItems($basketItems);
+
+        $form = \Iyzipay\Model\CheckoutFormInitialize::create($request, $options);
+
+        if ($form->getStatus() === 'success') {
+            $form_html = $form->getCheckoutFormContent();
+            $_SESSION['conversation_id'] = $conv_id;
+        } else {
+            $hata = $form->getErrorMessage();
+        }
     }
 }
 
@@ -44,54 +102,39 @@ if (!$isLoggedIn && $mode !== 'misafir') {
 
 function trPrice($value)
 {
-    return number_format((float)$value, 2, ",", ".");
+    return number_format((float) $value, 2, ",", ".");
 }
 
-// Uye bilgilerinin session'dan gelmesi beklenir.
-$memberData = [
-    "ad_soyad" => "Ayse Yilmaz",
-    "email" => "ayse@example.com",
-    "telefon" => "05XX XXX XX XX",
-    "adres" => "Ataturk Mah. Moda Cad. No:12 D:5",
-    "ilce" => "Kadikoy",
-    "il" => "Istanbul",
-    "posta_kodu" => "34710",
-];
-
+$memberData = [];
 if (isset($_SESSION["uye"]) && is_array($_SESSION["uye"])) {
-    $memberData = array_merge($memberData, $_SESSION["uye"]);
+    $memberData = $_SESSION["uye"];
 }
 
-$formValues = [
-    "ad_soyad" => $isLoggedIn ? ($memberData["ad_soyad"] ?? "") : "",
-    "email" => $isLoggedIn ? ($memberData["email"] ?? "") : "",
-    "telefon" => $isLoggedIn ? ($memberData["telefon"] ?? "") : "",
-    "adres" => $isLoggedIn ? ($memberData["adres"] ?? "") : "",
-    "ilce" => $isLoggedIn ? ($memberData["ilce"] ?? "") : "",
-    "il" => $isLoggedIn ? ($memberData["il"] ?? "") : "",
-    "posta_kodu" => $isLoggedIn ? ($memberData["posta_kodu"] ?? "") : "",
-];
-
-// Sepet: session'dan oku, yoksa ornek veri goster.
-$cartItems = [];
-if (isset($_SESSION["cart"]) && is_array($_SESSION["cart"])) {
-    foreach ($_SESSION["cart"] as $item) {
-        $cartItems[] = [
-            "name" => $item["name"] ?? "Urun",
-            "price" => (float)($item["price"] ?? 0),
-            "qty" => (int)($item["qty"] ?? 1),
-            "size" => $item["size"] ?? "-",
-            "color" => $item["color"] ?? "-",
-        ];
+$fields = ["ad_soyad", "email", "telefon", "adres", "ilce", "il", "posta_kodu"];
+$formValues = [];
+foreach ($fields as $f) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST[$f])) {
+        $formValues[$f] = $_POST[$f];
+    } elseif ($isLoggedIn) {
+        $formValues[$f] = $memberData[$f] ?? "";
+    } else {
+        $formValues[$f] = "";
     }
 }
 
-if (empty($cartItems)) {
-    $cartItems = [
-        ["name" => "Drapeli thong body", "price" => 749.99, "qty" => 1, "size" => "M", "color" => "Siyah"],
-        ["name" => "Basic ribana top", "price" => 399.50, "qty" => 2, "size" => "S", "color" => "Beyaz"],
-    ];
+$cartItems = [];
+if (isset($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
+    foreach ($_SESSION['sepet'] as $item) {
+        $cartItems[] = [
+            "name" => $item["ad"] ?? "Urun",
+            "price" => (float) ($item["fiyat"] ?? 0),
+            "qty" => (int) ($item["adet"] ?? 1),
+            "size" => $item["beden"] ?? "-",
+            "color" => $item["renk"] ?? "-",
+        ];
+    }
 }
+$sepetDolu = !empty($cartItems);
 
 $shipping = 49.90;
 $subtotal = 0;
@@ -160,7 +203,8 @@ include "header.php";
         margin-bottom: .32rem;
     }
 
-    .odeme-input, .odeme-select {
+    .odeme-input,
+    .odeme-select {
         width: 100%;
         border: 1px solid #d8d8d8;
         background: #fff;
@@ -169,7 +213,8 @@ include "header.php";
         font-size: .9rem;
     }
 
-    .odeme-input:focus, .odeme-select:focus {
+    .odeme-input:focus,
+    .odeme-select:focus {
         border-color: #000;
         outline: none;
     }
@@ -265,7 +310,6 @@ include "header.php";
         <h1 class="odeme-title">Teslimat ve Ödeme</h1>
         <p class="odeme-info">
             <?php if ($isLoggedIn): ?>
-                Kayitli uye bilgilerin otomatik getirildi. Gerekirse teslimat detaylarini guncelleyebilirsin.
             <?php else: ?>
                 Misafir olarak devam ediyorsun. Teslimat ve odeme bilgilerini doldurman gerekiyor.
             <?php endif; ?>
@@ -273,25 +317,35 @@ include "header.php";
 
         <form action="odeme.php" method="post">
             <div class="row g-4">
-                <div class="col-lg-8">
+                <div class="col-lg-8 order-2 order-lg-1">
                     <section class="checkout-card">
                         <h2 class="section-head">İletişim Bilgileri</h2>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="odeme-label" for="ad_soyad">Ad Soyad</label>
-                                <input class="odeme-input <?php echo $isLoggedIn ? "odeme-readonly" : ""; ?>" id="ad_soyad" name="ad_soyad" type="text" value="<?php echo htmlspecialchars((string)$formValues["ad_soyad"], ENT_QUOTES, "UTF-8"); ?>" <?php echo $isLoggedIn ? "readonly" : ""; ?> required>
+                                <input class="odeme-input"
+                                    id="ad_soyad" name="ad_soyad" type="text"
+                                    value="<?php echo htmlspecialchars((string) $formValues["ad_soyad"], ENT_QUOTES, "UTF-8"); ?>"
+                                    required>
                             </div>
                             <div class="col-md-6">
                                 <label class="odeme-label" for="email">E-posta</label>
-                                <input class="odeme-input <?php echo $isLoggedIn ? "odeme-readonly" : ""; ?>" id="email" name="email" type="email" value="<?php echo htmlspecialchars((string)$formValues["email"], ENT_QUOTES, "UTF-8"); ?>" <?php echo $isLoggedIn ? "readonly" : ""; ?> required>
+                                <input class="odeme-input" id="email"
+                                    name="email" type="email"
+                                    value="<?php echo htmlspecialchars((string) $formValues["email"], ENT_QUOTES, "UTF-8"); ?>"
+                                    required>
                             </div>
                             <div class="col-md-6">
                                 <label class="odeme-label" for="telefon">Telefon</label>
-                                <input class="odeme-input" id="telefon" name="telefon" type="text" value="<?php echo htmlspecialchars((string)$formValues["telefon"], ENT_QUOTES, "UTF-8"); ?>" required>
+                                <input class="odeme-input" id="telefon" name="telefon" type="text"
+                                    value="<?php echo htmlspecialchars((string) $formValues["telefon"], ENT_QUOTES, "UTF-8"); ?>"
+                                    required>
                             </div>
                             <div class="col-md-6">
                                 <label class="odeme-label" for="posta_kodu">Posta Kodu</label>
-                                <input class="odeme-input" id="posta_kodu" name="posta_kodu" type="text" value="<?php echo htmlspecialchars((string)$formValues["posta_kodu"], ENT_QUOTES, "UTF-8"); ?>" required>
+                                <input class="odeme-input" id="posta_kodu" name="posta_kodu" type="text"
+                                    value="<?php echo htmlspecialchars((string) $formValues["posta_kodu"], ENT_QUOTES, "UTF-8"); ?>"
+                                    required>
                             </div>
                         </div>
                     </section>
@@ -301,73 +355,59 @@ include "header.php";
                         <div class="row g-3">
                             <div class="col-12">
                                 <label class="odeme-label" for="adres">Adres</label>
-                                <input class="odeme-input" id="adres" name="adres" type="text" value="<?php echo htmlspecialchars((string)$formValues["adres"], ENT_QUOTES, "UTF-8"); ?>" required>
+                                <input class="odeme-input" id="adres" name="adres" type="text"
+                                    value="<?php echo htmlspecialchars((string) $formValues["adres"], ENT_QUOTES, "UTF-8"); ?>"
+                                    required>
                             </div>
                             <div class="col-md-6">
                                 <label class="odeme-label" for="ilce">İlçe</label>
-                                <input class="odeme-input" id="ilce" name="ilce" type="text" value="<?php echo htmlspecialchars((string)$formValues["ilce"], ENT_QUOTES, "UTF-8"); ?>" required>
+                                <input class="odeme-input" id="ilce" name="ilce" type="text"
+                                    value="<?php echo htmlspecialchars((string) $formValues["ilce"], ENT_QUOTES, "UTF-8"); ?>"
+                                    required>
                             </div>
                             <div class="col-md-6">
                                 <label class="odeme-label" for="il">İl</label>
-                                <input class="odeme-input" id="il" name="il" type="text" value="<?php echo htmlspecialchars((string)$formValues["il"], ENT_QUOTES, "UTF-8"); ?>" required>
+                                <input class="odeme-input" id="il" name="il" type="text"
+                                    value="<?php echo htmlspecialchars((string) $formValues["il"], ENT_QUOTES, "UTF-8"); ?>"
+                                    required>
                             </div>
                         </div>
                     </section>
 
-                    <section class="checkout-card">
-                        <h2 class="section-head">Kart bilgileri </h2>
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="odeme-label" for="card_holder">Kart Üzerindeki İsim</label>
-                                <input class="odeme-input" id="card_holder" name="card_holder" type="text" autocomplete="cc-name" required>
-                            </div>
-                            <div class="col-12">
-                                <label class="odeme-label" for="card_number">Kart Numarası</label>
-                                <input class="odeme-input" id="card_number" name="card_number" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" autocomplete="cc-number" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="odeme-label" for="expire_month">Ay</label>
-                                <select class="odeme-select" id="expire_month" name="expire_month" required>
-                                    <option value="">AA</option>
-                                    <?php for ($m = 1; $m <= 12; $m++): ?>
-                                        <option value="<?php echo str_pad((string)$m, 2, "0", STR_PAD_LEFT); ?>"><?php echo str_pad((string)$m, 2, "0", STR_PAD_LEFT); ?></option>
-                                    <?php endfor; ?>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="odeme-label" for="expire_year">Yıl</label>
-                                <select class="odeme-select" id="expire_year" name="expire_year" required>
-                                    <option value="">YYYY</option>
-                                    <?php $currentYear = (int)date("Y"); ?>
-                                    <?php for ($y = $currentYear; $y <= $currentYear + 10; $y++): ?>
-                                        <option value="<?php echo (string)$y; ?>"><?php echo (string)$y; ?></option>
-                                    <?php endfor; ?>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="odeme-label" for="cvc">CVC</label>
-                                <input class="odeme-input" id="cvc" name="cvc" type="password" inputmode="numeric" maxlength="4" autocomplete="cc-csc" required>
-                            </div>
+                    <?php if (isset($hata) && $hata): ?>
+                        <div class="alert alert-danger" style="font-size:.85rem;padding:.75rem 1rem;">
+                            Ödeme başlatılamadı: <?php echo htmlspecialchars($hata, ENT_QUOTES, 'UTF-8'); ?>
                         </div>
-                        <p class="odeme-note">
-                            Kart dogrulama ve odeme cekimi Iyzico tarafinda yapilacak sekilde alanlar hazirlandi.
-                        </p>
-                    </section>
+                    <?php endif; ?>
 
-                    <input type="hidden" name="payment_provider" value="iyzico">
-                    <input type="hidden" name="amount" value="<?php echo htmlspecialchars((string)$grandTotal, ENT_QUOTES, "UTF-8"); ?>">
-                    <button type="submit" class="btn-odeme">Guvenli odemeye gec</button>
+                    <?php if ($form_html): ?>
+                        <section class="checkout-card">
+                            <h2 class="section-head">Ödeme</h2>
+                            <div id="iyzipay-checkout-form" class="responsive"></div>
+                            <?= $form_html ?>
+                        </section>
+                    <?php elseif ($sepetDolu): ?>
+                        <input type="hidden" name="payment_provider" value="iyzico">
+                        <button type="submit" class="btn-odeme">Güvenli ödemeye geç</button>
+                    <?php else: ?>
+                        <p style="font-size:.88rem;color:#c00;margin-top:.5rem;">Sepetiniz boş. Ödeme yapabilmek için önce
+                            ürün ekleyin.</p>
+                    <?php endif; ?>
                 </div>
 
-                <div class="col-lg-4">
+                <div class="col-lg-4 order-1 order-lg-2">
                     <aside class="order-summary">
                         <h2 class="section-head">Siparis ozeti</h2>
 
                         <?php foreach ($cartItems as $item): ?>
                             <div class="order-item">
-                                <div class="order-item-name"><?php echo htmlspecialchars((string)$item["name"], ENT_QUOTES, "UTF-8"); ?></div>
+                                <div class="order-item-name">
+                                    <?php echo htmlspecialchars((string) $item["name"], ENT_QUOTES, "UTF-8"); ?>
+                                </div>
                                 <div class="order-item-meta">
-                                    Adet: <?php echo (int)$item["qty"]; ?> | Beden: <?php echo htmlspecialchars((string)$item["size"], ENT_QUOTES, "UTF-8"); ?> | Renk: <?php echo htmlspecialchars((string)$item["color"], ENT_QUOTES, "UTF-8"); ?>
+                                    Adet: <?php echo (int) $item["qty"]; ?> | Beden:
+                                    <?php echo htmlspecialchars((string) $item["size"], ENT_QUOTES, "UTF-8"); ?> | Renk:
+                                    <?php echo htmlspecialchars((string) $item["color"], ENT_QUOTES, "UTF-8"); ?>
                                 </div>
                                 <div class="order-item-price">
                                     <?php echo trPrice($item["price"] * $item["qty"]); ?> TL
