@@ -6,6 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'vendor/autoload.php';
 include 'config.php';
 
+
 $form_html = null;
 $hata = null;
 
