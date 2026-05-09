@@ -12,6 +12,10 @@ if ($adet < 1) {
     }
 }
 
+if (isset($_SESSION['sepet']) && empty($_SESSION['sepet'])) {
+    unset($_SESSION['sepet']);
+}
+
 header('Content-Type: application/json');
 echo json_encode(['basari' => true]);
 exit;

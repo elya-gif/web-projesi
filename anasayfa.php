@@ -23,7 +23,6 @@ include 'header.php';
         --sinir: #ddd;
     }
 
-    /* ── HERO ── */
     .hero {
         position: relative;
         height: calc(100vh - 80px);
@@ -290,7 +289,6 @@ include 'header.php';
 
     .btn-promo:hover { background: transparent; color: #fff; }
 
-    /* ── YENİ ÜRÜNLER ── */
     .urun-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -362,7 +360,6 @@ include 'header.php';
         font-weight: 700;
     }
 
-    /* ── TÜM ÜRÜNLER BUTONU ── */
     .tum-btn-wrap { text-align: center; margin-top: 2.5rem; }
     .btn-tum {
         display: inline-block;
@@ -379,7 +376,6 @@ include 'header.php';
     }
     .btn-tum:hover { background: var(--koyu); color: #fff; }
 
-    /* ── DEĞERLER ── */
     .degerler { background: #fff; }
     .deger-grid {
         display: grid;
@@ -400,14 +396,12 @@ include 'header.php';
     }
     .deger-acik { font-size: .8rem; color: #888; line-height: 1.6; }
 
-    /* ── RESPONSIVE ── */
     @media (max-width: 640px) {
         .info-band-item { padding: .7rem 1.2rem; font-size: .65rem; }
         .promo-banner { margin: 0 0 3rem; }
     }
 </style>
 
-<!-- HERO -->
 <section class="hero">
     <div class="hero-inner">
         <p class="hero-label">2026 Yaz Koleksiyonu</p>
@@ -426,7 +420,6 @@ include 'header.php';
     </div>
 </section>
 
-<!-- BİLGİ BANDI -->
 <div class="info-band">
     <div class="info-band-item">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5">
@@ -498,7 +491,6 @@ include 'header.php';
     </div>
 </section>
 
-<!-- PROMO BANNER -->
 <div class="promo-banner">
     <p class="promo-label">Özel Teklif</p>
     <h2 class="promo-title">Yazın En Şık<br>Parçaları Burada</h2>
@@ -506,7 +498,6 @@ include 'header.php';
     <a href="sayfalist.php?kategori=elbiseler" class="btn-promo">Elbiseleri Keşfet</a>
 </div>
 
-<!-- DEĞERLER -->
 <section class="section degerler">
     <div class="container-fluid px-3">
         <p class="section-sub">Neden Megay Moda?</p>
