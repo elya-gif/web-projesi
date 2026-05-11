@@ -3,9 +3,19 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once 'vendor/iyzipay/IyzipayBootstrap.php';
-IyzipayBootstrap::init(__DIR__ . '/vendor/iyzipay/src');
+// 1. HATALARI GÖRÜNÜR YAPALIM (Siyah 500 ekranı yerine hatayı görebilmek için)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// 2. KÜTÜPHANE DÜZELTMESİ (odeme.php ile aynı yöntemi kullanıyoruz)
+require_once 'vendor/autoload.php';
 include 'config.php';
+
+// DİKKAT: Veritabanı bağlantı dosyanızın adı neyse onu buraya dahil etmelisin!
+// Eğer veritabanı bağlantınız config.php içindeyse sorun yok.
+// Ama ayrı bir dosyadaysa (örn: veritabani.php) aşağıdaki satırın başındaki // işaretini silip dosya adını yaz.
+// include 'baglan.php'; 
 
 $token = $_POST['token'] ?? null;
 
@@ -33,7 +43,6 @@ $result = \Iyzipay\Model\CheckoutForm::retrieve($request, $options);
 $odeme_basarili = $result->getPaymentStatus() === 'SUCCESS';
 
 if (!$odeme_basarili) {
-
     include "header.php";
     ?>
     <style>
@@ -84,22 +93,33 @@ if (!empty($sepet)) {
     }
     $toplam += 49.90;
 
-    $stmt = $pdo->prepare(
-        'INSERT INTO siparisler (kullanici_id, toplam, durum, tarih)
-         VALUES (?, ?, ?, NOW())'
-    );
-    $stmt->execute([$user_id, $toplam, 'odendi']);
-    $siparis_id = (int) $pdo->lastInsertId();
+    // 3. VERİTABANI HATALARINI YAKALAMAK İÇİN TRY-CATCH EKLENDİ
+    try {
+        if (!isset($pdo)) {
+            die("<div style='padding:2rem; color:red; font-weight:bold;'>Veritabanı bağlantısı bulunamadı! Lütfen kodun üst kısmındaki include alanına veritabanı bağlantı dosyanızı (baglan.php vb.) ekleyin.</div>");
+        }
 
-    $stmt2 = $pdo->prepare(
-        'INSERT INTO siparis_urunler (siparis_id, urun_id, adet, fiyat)
-         VALUES (?, ?, ?, ?)'
-    );
-    foreach ($sepet as $urun_id => $urun) {
-        $stmt2->execute([$siparis_id, $urun_id, $urun['adet'], $urun['fiyat']]);
+        $stmt = $pdo->prepare(
+            'INSERT INTO siparisler (kullanici_id, toplam, durum, tarih)
+             VALUES (?, ?, ?, NOW())'
+        );
+        
+        // Misafir kullanıcı ise user_id null gidebilir. Eğer veritabanında kullanici_id alanı zorunluysa (NOT NULL), burası hata verecektir.
+        $stmt->execute([$user_id, $toplam, 'odendi']);
+        $siparis_id = (int) $pdo->lastInsertId();
+
+        $stmt2 = $pdo->prepare(
+            'INSERT INTO siparis_urunler (siparis_id, urun_id, adet, fiyat)
+             VALUES (?, ?, ?, ?)'
+        );
+        foreach ($sepet as $urun_id => $urun) {
+            $stmt2->execute([$siparis_id, $urun_id, $urun['adet'], $urun['fiyat']]);
+        }
+
+        unset($_SESSION['sepet']);
+    } catch (PDOException $e) {
+        die("<div style='padding:2rem; color:red;'><strong>Veritabanı Hatası:</strong> " . $e->getMessage() . "</div>");
     }
-
-    unset($_SESSION['sepet']);
 }
 
 $siparis_urunler = [];

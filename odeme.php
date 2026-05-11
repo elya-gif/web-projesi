@@ -2,10 +2,11 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 require_once 'vendor/autoload.php';
 include 'config.php';
-
 
 $form_html = null;
 $hata = null;
@@ -36,7 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $buyer->setLastLoginDate('2015-10-05 12:43:35');
         $buyer->setRegistrationDate('2013-04-21 15:12:09');
         $buyer->setRegistrationAddress($_POST['adres']);
-        $buyer->setIp($_SERVER['REMOTE_ADDR']);
+        
+        // DÜZELTME: Windows/PC Localhost IP (::1) sorunu çözümü
+        $ip = $_SERVER['REMOTE_ADDR'];
+        if ($ip === '::1' || $ip === '127.0.0.1') {
+            $ip = '85.105.1.1'; // İyzico'nun IP reddetmesini önlemek için sanal IP
+        }
+        $buyer->setIp($ip);
+        
         $buyer->setCity($_POST['il']);
         $buyer->setCountry('Turkey');
         $buyer->setZipCode($_POST['posta_kodu']);
@@ -75,7 +83,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $request->setPaidPrice($toplam_str);
         $request->setCurrency(\Iyzipay\Model\Currency::TL);
         $request->setEnabledInstallments([1, 2, 3, 6, 9]);
-        $request->setCallbackUrl('http://localhost:8888/web-projesi/siparis-onay.php');
+        
+        // DİKKAT: Tarayıcındaki adres çubuğunda 8888 yazmıyorsa, buradaki 8888'i silmelisin.
+        $request->setCallbackUrl('http://localhost:8888/web-projesi/siparis-onay.php'); 
+        
         $request->setBuyer($buyer);
         $request->setShippingAddress($adres);
         $request->setBillingAddress($adres);
@@ -126,18 +137,18 @@ $cartItems = [];
 if (isset($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
     foreach ($_SESSION['sepet'] as $item) {
         $cartItems[] = [
-            "name" => $item["ad"] ?? "Urun",
+            "name"  => $item["ad"] ?? "Urun",
             "price" => (float) ($item["fiyat"] ?? 0),
-            "qty" => (int) ($item["adet"] ?? 1),
-            "size" => $item["beden"] ?? "-",
+            "qty"   => (int) ($item["adet"] ?? 1),
+            "size"  => $item["beden"] ?? "-",
             "color" => $item["renk"] ?? "-",
         ];
     }
 }
 $sepetDolu = !empty($cartItems);
 
-$shipping = 49.90;
-$subtotal = 0;
+$shipping  = 49.90;
+$subtotal  = 0;
 foreach ($cartItems as $row) {
     $subtotal += $row["price"] * $row["qty"];
 }

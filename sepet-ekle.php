@@ -1,4 +1,5 @@
 <?php
+echo '<pre>'; print_r($_SESSION); echo '</pre>';
 session_start();
 
 $urun_id = $_POST['urun_id'];
