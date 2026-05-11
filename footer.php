@@ -158,8 +158,8 @@
 
         <div class="footer-box">
             <h3>İletişim</h3>
-            <p>📍 Adana / Çukurova</p>
-            <p>📞 05xx xxx xx xx</p>
+            <p>📍 Adana / Çukurova /Huzurevleri mah.</p>
+            <p>📞 0539 599 57 27</p>
             <p>✉ info@megaymoda.com</p>
             
 

@@ -1,0 +1,12 @@
+{
+    "name": "yagmurelifaltun/web-projesi",
+    "authors": [
+        {
+            "name": "elya-gif",
+            "email": "yagmurealtun@gmail.com"
+        }
+    ],
+    "require": {
+        "iyzico/iyzipay-php": "^2.0"
+    }
+}

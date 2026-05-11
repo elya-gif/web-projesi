@@ -148,7 +148,7 @@ include 'header.php';
 
     .pb-product-card:hover .pb-hover-panel { bottom: 0; }
 
-    @media (max-width: 768px) { .pb-hover-panel { bottom: 0; } }
+    @media (max-width: 768px) { .pb-hover-panel { bottom: -80px; } }
 
     .pb-size-select {
         flex: 1;
@@ -363,13 +363,56 @@ include 'header.php';
         });
     });
 
-    document.querySelectorAll('.js-hover-add').forEach(function (btn) {
+   document.querySelectorAll('.js-hover-add').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const card = this.closest('.pb-product-card');
             const select = card.querySelector('.pb-size-select');
             const size = select.value;
-            if (!size) { alert('Lütfen beden seçiniz.'); return; }
-            alert('Ürün sepete eklendi. Beden: ' + size);
+            
+            if (!size) { 
+                alert('Lütfen beden seçiniz.'); 
+                return; 
+            }
+
+            const productId = card.getAttribute('data-product-id');
+            const productName = card.getAttribute('data-product-name');
+            const productPrice = card.getAttribute('data-product-price');
+            const productImage = card.getAttribute('data-product-image');
+
+            // Görünmez form yerine, verileri paketleyip arka planda gönderiyoruz (AJAX/Fetch)
+            const formData = new FormData();
+            formData.append('urun_id', productId);
+            formData.append('ad', productName);
+            formData.append('fiyat', productPrice);
+            formData.append('gorsel', productImage);
+            formData.append('beden', size);
+
+            // sepet-ekle.php'ye sessizce istek atıyoruz
+            fetch('sepet-ekle.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) {
+                // 1. İşlem arka planda bitince kullanıcıya bilgi ver
+                alert('Ürün sepete eklendi! Beden: ' + size);
+
+                // 2. Sayfayı YENİLEMEDEN sağ üstteki sepet ikonundaki sayıyı 1 artır
+                let sepetSayaci = document.querySelector('.sepet-sayi');
+                
+                if (sepetSayaci) {
+                    // Eğer sepette zaten ürün varsa sayıyı artır
+                    let mevcutSayi = parseInt(sepetSayaci.textContent);
+                    sepetSayaci.textContent = mevcutSayi + 1;
+                } else {
+                    // Eğer sepet daha önce tamamen boşsa (ikonun üstünde sayı yoksa)
+                    // ikonu düzgün göstermek için sayfayı yenilemek en pratiğidir
+                    window.location.reload();
+                }
+            })
+            .catch(function(error) {
+                alert('Sepete eklerken bir hata oluştu.');
+                console.error('Hata:', error);
+            });
         });
     });
 
