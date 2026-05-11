@@ -1,7 +1,10 @@
 <?php
+// İşletim sistemine göre MySQL portunu otomatik ayarla
+$port = (PHP_OS === 'WINNT') ? '3306' : '8889';
+
 try {
     $pdo = new PDO(
-        'mysql:host=127.0.0.1;port=8889;dbname=megay_moda;charset=utf8',
+        "mysql:host=127.0.0.1;port=$port;dbname=megay_moda;charset=utf8",
         'root',
         'root'
     );
