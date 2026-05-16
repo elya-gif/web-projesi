@@ -241,18 +241,34 @@ include 'header.php';
         <p class="text-muted small">Bu kategori için henüz ürün eklenmedi.</p>
     <?php else: ?>
         <div class="row g-3 g-md-4">
-            <?php foreach ($urunler as $urun): ?>
+            <?php foreach ($urunler as $urun):
+                
+                // --- KART GÖRSELİ AYARLAMA (JSON ÇÖZÜMÜ) ---
+                $kart_gorsel = 'images/placeholder.jpg'; 
+                $gorsel_metni = (string)($urun['gorsel'] ?? ''); 
+                $cozulen_gorsel = json_decode($gorsel_metni, true);
+                
+                // Eğer yeni sistemle (JSON dizisi) eklendiyse ilk resmi al
+                if (is_array($cozulen_gorsel) && !empty($cozulen_gorsel)) {
+                    $kart_gorsel = $cozulen_gorsel[0]; 
+                } 
+                // Eğer eski sistemle eklendiyse direkt al
+                elseif (!empty($gorsel_metni) && !is_array($cozulen_gorsel)) {
+                    $kart_gorsel = $gorsel_metni;
+                }
+                // -------------------------------------------
+            ?>
                 <div class="col-6 col-md-4 col-lg-3">
                     <div class="pb-product-card"
                          data-product-id="<?php echo (int)$urun['id']; ?>"
                          data-product-name="<?php echo htmlspecialchars($urun['ad'], ENT_QUOTES); ?>"
                          data-product-price="<?php echo htmlspecialchars((string)$urun['fiyat'], ENT_QUOTES); ?>"
-                         data-product-image="<?php echo htmlspecialchars($urun['gorsel'], ENT_QUOTES); ?>"
+                         data-product-image="<?php echo htmlspecialchars($kart_gorsel, ENT_QUOTES); ?>"
                          data-product-category="<?php echo htmlspecialchars($urun['kategori'], ENT_QUOTES); ?>">
 
                         <div class="pb-image-wrapper">
                             <img
-                                src="images/<?php echo htmlspecialchars($urun['gorsel']); ?>"
+                                src="<?php echo htmlspecialchars($kart_gorsel); ?>"
                                 alt="<?php echo htmlspecialchars($urun['ad']); ?>"
                             >
 
@@ -306,11 +322,7 @@ include 'header.php';
     <span>&uarr;</span>
 </button>
 
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"
-></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 <script>
     const FAV_KEY = 'megay_favorites';
@@ -363,15 +375,15 @@ include 'header.php';
         });
     });
 
-   document.querySelectorAll('.js-hover-add').forEach(function (btn) {
+    document.querySelectorAll('.js-hover-add').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const card = this.closest('.pb-product-card');
             const select = card.querySelector('.pb-size-select');
             const size = select.value;
-            
-            if (!size) { 
-                alert('Lütfen beden seçiniz.'); 
-                return; 
+
+            if (!size) {
+                alert('Lütfen beden seçiniz.');
+                return;
             }
 
             const productId = card.getAttribute('data-product-id');
@@ -379,7 +391,6 @@ include 'header.php';
             const productPrice = card.getAttribute('data-product-price');
             const productImage = card.getAttribute('data-product-image');
 
-            // Görünmez form yerine, verileri paketleyip arka planda gönderiyoruz (AJAX/Fetch)
             const formData = new FormData();
             formData.append('urun_id', productId);
             formData.append('ad', productName);
@@ -387,25 +398,17 @@ include 'header.php';
             formData.append('gorsel', productImage);
             formData.append('beden', size);
 
-            // sepet-ekle.php'ye sessizce istek atıyoruz
             fetch('sepet-ekle.php', {
                 method: 'POST',
                 body: formData
             })
             .then(function(response) {
-                // 1. İşlem arka planda bitince kullanıcıya bilgi ver
                 alert('Ürün sepete eklendi! Beden: ' + size);
-
-                // 2. Sayfayı YENİLEMEDEN sağ üstteki sepet ikonundaki sayıyı 1 artır
                 let sepetSayaci = document.querySelector('.sepet-sayi');
-                
                 if (sepetSayaci) {
-                    // Eğer sepette zaten ürün varsa sayıyı artır
                     let mevcutSayi = parseInt(sepetSayaci.textContent);
                     sepetSayaci.textContent = mevcutSayi + 1;
                 } else {
-                    // Eğer sepet daha önce tamamen boşsa (ikonun üstünde sayı yoksa)
-                    // ikonu düzgün göstermek için sayfayı yenilemek en pratiğidir
                     window.location.reload();
                 }
             })

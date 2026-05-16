@@ -37,14 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $buyer->setLastLoginDate('2015-10-05 12:43:35');
         $buyer->setRegistrationDate('2013-04-21 15:12:09');
         $buyer->setRegistrationAddress($_POST['adres']);
-        
+
         // DÜZELTME: Windows/PC Localhost IP (::1) sorunu çözümü
         $ip = $_SERVER['REMOTE_ADDR'];
         if ($ip === '::1' || $ip === '127.0.0.1') {
             $ip = '85.105.1.1'; // İyzico'nun IP reddetmesini önlemek için sanal IP
         }
         $buyer->setIp($ip);
-        
+
         $buyer->setCity($_POST['il']);
         $buyer->setCountry('Turkey');
         $buyer->setZipCode($_POST['posta_kodu']);
@@ -83,10 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $request->setPaidPrice($toplam_str);
         $request->setCurrency(\Iyzipay\Model\Currency::TL);
         $request->setEnabledInstallments([1, 2, 3, 6, 9]);
-        
-        // DİKKAT: Tarayıcındaki adres çubuğunda 8888 yazmıyorsa, buradaki 8888'i silmelisin.
-        $request->setCallbackUrl('http://localhost:8888/web-projesi/siparis-onay.php'); 
-        
+
+        $request->setCallbackUrl('https://megaymoda.com.tr/siparis-onay.php');
         $request->setBuyer($buyer);
         $request->setShippingAddress($adres);
         $request->setBillingAddress($adres);
@@ -137,18 +135,18 @@ $cartItems = [];
 if (isset($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
     foreach ($_SESSION['sepet'] as $item) {
         $cartItems[] = [
-            "name"  => $item["ad"] ?? "Urun",
+            "name" => $item["ad"] ?? "Urun",
             "price" => (float) ($item["fiyat"] ?? 0),
-            "qty"   => (int) ($item["adet"] ?? 1),
-            "size"  => $item["beden"] ?? "-",
+            "qty" => (int) ($item["adet"] ?? 1),
+            "size" => $item["beden"] ?? "-",
             "color" => $item["renk"] ?? "-",
         ];
     }
 }
 $sepetDolu = !empty($cartItems);
 
-$shipping  = 49.90;
-$subtotal  = 0;
+$shipping = 49.90;
+$subtotal = 0;
 foreach ($cartItems as $row) {
     $subtotal += $row["price"] * $row["qty"];
 }
@@ -369,115 +367,115 @@ include "header.php";
                 </div>
             </div>
         <?php else: ?>
-        <form action="odeme.php" method="post">
-            <input type="hidden" name="mod" value="<?php echo htmlspecialchars($mode, ENT_QUOTES, 'UTF-8'); ?>">
-            <div class="row g-4">
-                <div class="col-lg-8 order-2 order-lg-1">
-                    <section class="checkout-card">
-                        <h2 class="section-head">İletişim Bilgileri</h2>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="odeme-label" for="ad_soyad">Ad Soyad</label>
-                                <input class="odeme-input" id="ad_soyad" name="ad_soyad" type="text"
-                                    value="<?php echo htmlspecialchars((string) $formValues["ad_soyad"], ENT_QUOTES, "UTF-8"); ?>"
-                                    required>
+            <form action="odeme.php" method="post">
+                <input type="hidden" name="mod" value="<?php echo htmlspecialchars($mode, ENT_QUOTES, 'UTF-8'); ?>">
+                <div class="row g-4">
+                    <div class="col-lg-8 order-2 order-lg-1">
+                        <section class="checkout-card">
+                            <h2 class="section-head">İletişim Bilgileri</h2>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="odeme-label" for="ad_soyad">Ad Soyad</label>
+                                    <input class="odeme-input" id="ad_soyad" name="ad_soyad" type="text"
+                                        value="<?php echo htmlspecialchars((string) $formValues["ad_soyad"], ENT_QUOTES, "UTF-8"); ?>"
+                                        required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="odeme-label" for="email">E-posta</label>
+                                    <input class="odeme-input" id="email" name="email" type="email"
+                                        value="<?php echo htmlspecialchars((string) $formValues["email"], ENT_QUOTES, "UTF-8"); ?>"
+                                        required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="odeme-label" for="telefon">Telefon</label>
+                                    <input class="odeme-input" id="telefon" name="telefon" type="text"
+                                        value="<?php echo htmlspecialchars((string) $formValues["telefon"], ENT_QUOTES, "UTF-8"); ?>"
+                                        required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="odeme-label" for="posta_kodu">Posta Kodu</label>
+                                    <input class="odeme-input" id="posta_kodu" name="posta_kodu" type="text"
+                                        value="<?php echo htmlspecialchars((string) $formValues["posta_kodu"], ENT_QUOTES, "UTF-8"); ?>"
+                                        required>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="odeme-label" for="email">E-posta</label>
-                                <input class="odeme-input" id="email" name="email" type="email"
-                                    value="<?php echo htmlspecialchars((string) $formValues["email"], ENT_QUOTES, "UTF-8"); ?>"
-                                    required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="odeme-label" for="telefon">Telefon</label>
-                                <input class="odeme-input" id="telefon" name="telefon" type="text"
-                                    value="<?php echo htmlspecialchars((string) $formValues["telefon"], ENT_QUOTES, "UTF-8"); ?>"
-                                    required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="odeme-label" for="posta_kodu">Posta Kodu</label>
-                                <input class="odeme-input" id="posta_kodu" name="posta_kodu" type="text"
-                                    value="<?php echo htmlspecialchars((string) $formValues["posta_kodu"], ENT_QUOTES, "UTF-8"); ?>"
-                                    required>
-                            </div>
-                        </div>
-                    </section>
+                        </section>
 
-                    <section class="checkout-card">
-                        <h2 class="section-head">Teslimat adresi</h2>
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="odeme-label" for="adres">Adres</label>
-                                <input class="odeme-input" id="adres" name="adres" type="text"
-                                    value="<?php echo htmlspecialchars((string) $formValues["adres"], ENT_QUOTES, "UTF-8"); ?>"
-                                    required>
+                        <section class="checkout-card">
+                            <h2 class="section-head">Teslimat adresi</h2>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="odeme-label" for="adres">Adres</label>
+                                    <input class="odeme-input" id="adres" name="adres" type="text"
+                                        value="<?php echo htmlspecialchars((string) $formValues["adres"], ENT_QUOTES, "UTF-8"); ?>"
+                                        required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="odeme-label" for="ilce">İlçe</label>
+                                    <input class="odeme-input" id="ilce" name="ilce" type="text"
+                                        value="<?php echo htmlspecialchars((string) $formValues["ilce"], ENT_QUOTES, "UTF-8"); ?>"
+                                        required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="odeme-label" for="il">İl</label>
+                                    <input class="odeme-input" id="il" name="il" type="text"
+                                        value="<?php echo htmlspecialchars((string) $formValues["il"], ENT_QUOTES, "UTF-8"); ?>"
+                                        required>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="odeme-label" for="ilce">İlçe</label>
-                                <input class="odeme-input" id="ilce" name="ilce" type="text"
-                                    value="<?php echo htmlspecialchars((string) $formValues["ilce"], ENT_QUOTES, "UTF-8"); ?>"
-                                    required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="odeme-label" for="il">İl</label>
-                                <input class="odeme-input" id="il" name="il" type="text"
-                                    value="<?php echo htmlspecialchars((string) $formValues["il"], ENT_QUOTES, "UTF-8"); ?>"
-                                    required>
-                            </div>
-                        </div>
-                    </section>
+                        </section>
 
-                    <?php if (isset($hata) && $hata): ?>
-                        <div class="alert alert-danger" style="font-size:.85rem;padding:.75rem 1rem;">
-                            Ödeme başlatılamadı: <?php echo htmlspecialchars($hata, ENT_QUOTES, 'UTF-8'); ?>
-                        </div>
-                    <?php endif; ?>
+                        <?php if (isset($hata) && $hata): ?>
+                            <div class="alert alert-danger" style="font-size:.85rem;padding:.75rem 1rem;">
+                                Ödeme başlatılamadı: <?php echo htmlspecialchars($hata, ENT_QUOTES, 'UTF-8'); ?>
+                            </div>
+                        <?php endif; ?>
 
-                    <?php if ($sepetDolu): ?>
-                        <input type="hidden" name="payment_provider" value="iyzico">
-                        <button type="submit" class="btn-odeme">Güvenli ödemeye geç</button>
-                    <?php else: ?>
-                        <p style="font-size:.88rem;color:#c00;margin-top:.5rem;">Sepetiniz boş. Ödeme yapabilmek için önce
-                            ürün ekleyin.</p>
-                    <?php endif; ?>
+                        <?php if ($sepetDolu): ?>
+                            <input type="hidden" name="payment_provider" value="iyzico">
+                            <button type="submit" class="btn-odeme">Güvenli ödemeye geç</button>
+                        <?php else: ?>
+                            <p style="font-size:.88rem;color:#c00;margin-top:.5rem;">Sepetiniz boş. Ödeme yapabilmek için önce
+                                ürün ekleyin.</p>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="col-lg-4 order-1 order-lg-2">
+                        <aside class="order-summary">
+                            <h2 class="section-head">Siparis ozeti</h2>
+
+                            <?php foreach ($cartItems as $item): ?>
+                                <div class="order-item">
+                                    <div class="order-item-name">
+                                        <?php echo htmlspecialchars((string) $item["name"], ENT_QUOTES, "UTF-8"); ?>
+                                    </div>
+                                    <div class="order-item-meta">
+                                        Adet: <?php echo (int) $item["qty"]; ?> | Beden:
+                                        <?php echo htmlspecialchars((string) $item["size"], ENT_QUOTES, "UTF-8"); ?> | Renk:
+                                        <?php echo htmlspecialchars((string) $item["color"], ENT_QUOTES, "UTF-8"); ?>
+                                    </div>
+                                    <div class="order-item-price">
+                                        <?php echo trPrice($item["price"] * $item["qty"]); ?> TL
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+
+                            <div class="sum-row">
+                                <span>Siparis bedeli</span>
+                                <span><?php echo trPrice($subtotal); ?> TL</span>
+                            </div>
+                            <div class="sum-row">
+                                <span>Teslimat</span>
+                                <span><?php echo trPrice($shipping); ?> TL</span>
+                            </div>
+                            <div class="sum-row sum-total">
+                                <span>Toplam</span>
+                                <span><?php echo trPrice($grandTotal); ?> TL</span>
+                            </div>
+                        </aside>
+                    </div>
                 </div>
-
-                <div class="col-lg-4 order-1 order-lg-2">
-                    <aside class="order-summary">
-                        <h2 class="section-head">Siparis ozeti</h2>
-
-                        <?php foreach ($cartItems as $item): ?>
-                            <div class="order-item">
-                                <div class="order-item-name">
-                                    <?php echo htmlspecialchars((string) $item["name"], ENT_QUOTES, "UTF-8"); ?>
-                                </div>
-                                <div class="order-item-meta">
-                                    Adet: <?php echo (int) $item["qty"]; ?> | Beden:
-                                    <?php echo htmlspecialchars((string) $item["size"], ENT_QUOTES, "UTF-8"); ?> | Renk:
-                                    <?php echo htmlspecialchars((string) $item["color"], ENT_QUOTES, "UTF-8"); ?>
-                                </div>
-                                <div class="order-item-price">
-                                    <?php echo trPrice($item["price"] * $item["qty"]); ?> TL
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-
-                        <div class="sum-row">
-                            <span>Siparis bedeli</span>
-                            <span><?php echo trPrice($subtotal); ?> TL</span>
-                        </div>
-                        <div class="sum-row">
-                            <span>Teslimat</span>
-                            <span><?php echo trPrice($shipping); ?> TL</span>
-                        </div>
-                        <div class="sum-row sum-total">
-                            <span>Toplam</span>
-                            <span><?php echo trPrice($grandTotal); ?> TL</span>
-                        </div>
-                    </aside>
-                </div>
-            </div>
-        </form>
+            </form>
         <?php endif; ?>
     </div>
 </main>

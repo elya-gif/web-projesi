@@ -12,6 +12,36 @@ if (!$urun) {
     exit;
 }
 
+// Tüm görselleri topla
+$tum_gorseller = [];
+
+// 1. Yeni Sistem: JSON olarak kaydedilen çoklu görselleri ayıkla
+if (!empty($urun['gorsel'])) {
+    $cozulen_gorseller = json_decode($urun['gorsel'], true);
+    
+    // Eğer json_decode başarılıysa ve bu bir diziyse (çoklu resim varsa)
+    if (is_array($cozulen_gorseller)) {
+        foreach ($cozulen_gorseller as $g) {
+            $tum_gorseller[] = $g;
+        }
+    } else {
+        // Eski sistem tek resim eklendiyse (geriye dönük uyumluluk)
+        $tum_gorseller[] = $urun['gorsel'];
+    }
+}
+
+// 2. Eski Sistem (urun_gorselleri tablosundan gelenler - Varsa bozulmasın diye tutuyoruz)
+$stmt2 = $pdo->prepare('SELECT gorsel_yolu FROM urun_gorselleri WHERE urun_id = ? ORDER BY sira ASC');
+$stmt2->execute([$id]);
+$ek = $stmt2->fetchAll(PDO::FETCH_COLUMN);
+foreach ($ek as $e) {
+    if (!in_array($e, $tum_gorseller)) {
+        $tum_gorseller[] = $e;
+    }
+}
+
+$gorsel_sayisi = count($tum_gorseller);
+
 include "header.php";
 ?>
 
@@ -19,8 +49,6 @@ include "header.php";
     :root {
         --bg-color: #ffffff;
         --text-color: #000000;
-        --accent-color: #c9a063;
-        --accent-dark: #8b6a2b;
         --border-color: #e6e6e6;
         --muted-text: #666666;
         --heart-active: #e63946;
@@ -38,18 +66,15 @@ include "header.php";
         padding: 24px 16px 40px;
     }
 
-    .breadcrumb {
-        font-size: .8rem;
-        color: var(--muted-text);
-        margin-bottom: 12px;
-    }
-
-    .breadcrumb a {
-        color: var(--muted-text);
-        text-decoration: none;
-    }
-
+    .breadcrumb { font-size: .8rem; color: var(--muted-text); margin-bottom: 12px; }
+    .breadcrumb a { color: var(--muted-text); text-decoration: none; }
     .breadcrumb a:hover { text-decoration: underline; }
+
+    /* GALERİ */
+    .galeri-alan {
+        position: relative;
+        max-width: 480px; /* görsel çok büyük açılmasın */
+    }
 
     .gallery-main {
         position: relative;
@@ -66,51 +91,51 @@ include "header.php";
         display: block;
     }
 
-    .gallery-thumbs {
+    /* Ok butonları — sadece çoklu görselde görünür */
+    .galeri-ok {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255,255,255,0.9);
+        border: 1px solid #ddd;
+        border-radius: 50%;
+        width: 38px;
+        height: 38px;
         display: flex;
-        gap: 8px;
-        margin-top: 10px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 5;
+        font-size: 1rem;
+        transition: background .2s;
     }
+
+    .galeri-ok:hover { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+    .galeri-ok.sol { left: 8px; }
+    .galeri-ok.sag { right: 8px; }
+
+    /* Thumbnail — sadece çoklu görselde görünür */
+    .gallery-thumbs { display: flex; gap: 8px; margin-top: 10px; }
 
     .gallery-thumb {
-        flex: 1;
-        border-radius: 8px;
+        width: 64px;
+        height: 80px;
+        border-radius: 6px;
         overflow: hidden;
-        border: 1px solid transparent;
+        border: 2px solid transparent;
         cursor: pointer;
         background: #f5f5f5;
-        aspect-ratio: 3 / 4;
+        flex-shrink: 0;
     }
 
-    .gallery-thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-
+    .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .gallery-thumb.active { border-color: #000; }
 
-    .product-title {
-        font-size: 1.4rem;
-        font-weight: 600;
-        margin-bottom: .25rem;
-    }
-
-    .product-price {
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin-bottom: .1rem;
-    }
-
+    /* ÜRÜN BİLGİLERİ */
+    .product-title { font-size: 1.4rem; font-weight: 600; margin-bottom: .25rem; }
+    .product-price { font-size: 1.2rem; font-weight: 600; margin-bottom: .1rem; }
     .size-label { font-size: .85rem; margin-bottom: .3rem; }
-
-    .size-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: .35rem;
-        margin-bottom: .75rem;
-    }
+    .size-grid { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: .75rem; }
 
     .size-btn {
         min-width: 44px;
@@ -123,24 +148,9 @@ include "header.php";
     }
 
     .size-btn:hover { border-color: #000; }
-
-    .size-btn.active {
-        border-color: #000;
-        background-color: #000;
-        color: #fff;
-    }
-
-    .size-help {
-        font-size: .8rem;
-        color: var(--muted-text);
-        margin-bottom: 1rem;
-    }
-
-    .action-row {
-        display: flex;
-        gap: .5rem;
-        margin-bottom: .75rem;
-    }
+    .size-btn.active { border-color: #000; background-color: #000; color: #fff; }
+    .size-help { font-size: .8rem; color: var(--muted-text); margin-bottom: 1rem; }
+    .action-row { display: flex; gap: .5rem; margin-bottom: .75rem; }
 
     .btn-add-to-cart {
         flex: 1;
@@ -169,35 +179,25 @@ include "header.php";
         font-size: 1.2rem;
     }
 
-    .btn-fav.active {
-        border-color: var(--heart-active);
-        color: var(--heart-active);
-    }
+    .btn-fav.active { border-color: var(--heart-active); color: var(--heart-active); }
 
-    .delivery-info,
-    .product-description,
-    .care-info {
+    .delivery-info, .product-description, .care-info {
         font-size: .85rem;
         color: var(--muted-text);
         margin-bottom: .7rem;
     }
 
-    .delivery-info strong,
-    .product-description strong,
-    .care-info strong {
+    .delivery-info strong, .product-description strong, .care-info strong {
         color: #000;
         font-weight: 500;
     }
 
-    .stok-uyari {
-        font-size: .85rem;
-        color: #e63946;
-        margin-bottom: .75rem;
-    }
+    .stok-uyari { font-size: .85rem; color: #e63946; margin-bottom: .75rem; }
 
     @media (max-width: 768px) {
         .page-wrapper { padding-top: 16px; }
         .product-title { margin-top: 12px; }
+        .galeri-alan { max-width: 100%; }
     }
 </style>
 
@@ -208,20 +208,36 @@ include "header.php";
 
     <div class="row g-4">
         <div class="col-12 col-md-7">
-            <div class="gallery-main" id="mainImage">
-                <img src="images/<?= htmlspecialchars($urun['gorsel']) ?>" alt="<?= htmlspecialchars($urun['ad']) ?>">
-            </div>
+            <div class="galeri-alan">
 
-            <div class="gallery-thumbs mt-2">
-                <div class="gallery-thumb active" data-image="images/<?= htmlspecialchars($urun['gorsel']) ?>">
-                    <img src="images/<?= htmlspecialchars($urun['gorsel']) ?>" alt="">
+                <div class="gallery-main" id="mainImage">
+                    <img id="anaGorselImg"
+                         src="<?= !empty($tum_gorseller) ? htmlspecialchars($tum_gorseller[0]) : 'images/placeholder.jpg' ?>"
+                         alt="<?= htmlspecialchars($urun['ad']) ?>">
+
+                    <?php if ($gorsel_sayisi > 1): ?>
+                        <button class="galeri-ok sol" id="okSol">&#8592;</button>
+                        <button class="galeri-ok sag" id="okSag">&#8594;</button>
+                    <?php endif; ?>
                 </div>
+
+                <?php if ($gorsel_sayisi > 1): ?>
+                <div class="gallery-thumbs mt-2">
+                    <?php foreach ($tum_gorseller as $i => $g): ?>
+                        <div class="gallery-thumb <?= $i === 0 ? 'active' : '' ?>"
+                             data-index="<?= $i ?>"
+                             data-src="<?= htmlspecialchars($g) ?>">
+                            <img src="<?= htmlspecialchars($g) ?>" alt="Görsel <?= $i+1 ?>">
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+
             </div>
         </div>
 
         <div class="col-12 col-md-5">
             <h1 class="product-title"><?= htmlspecialchars($urun['ad']) ?></h1>
-
             <div class="product-price"><?= number_format($urun['fiyat'], 2, ',', '.') ?> TL</div>
 
             <?php if ((int)$urun['stok'] === 0): ?>
@@ -231,7 +247,7 @@ include "header.php";
             <?php endif; ?>
 
             <div class="size-label">Beden seçin</div>
-            <div class="size-grid" id="sizeGrid">
+            <div class="size-grid">
                 <button class="size-btn" data-size="XS">XS</button>
                 <button class="size-btn" data-size="S">S</button>
                 <button class="size-btn" data-size="M">M</button>
@@ -250,7 +266,7 @@ include "header.php";
                     data-product-id="<?= $urun['id'] ?>"
                     data-product-name="<?= htmlspecialchars($urun['ad']) ?>"
                     data-product-price="<?= htmlspecialchars($urun['fiyat']) ?>"
-                    data-product-image="<?= htmlspecialchars($urun['gorsel']) ?>"
+                    data-product-image="<?= !empty($tum_gorseller) ? htmlspecialchars($tum_gorseller[0]) : '' ?>"
                     data-product-category="<?= htmlspecialchars($urun['kategori']) ?>">
                     ♥
                 </button>
@@ -274,23 +290,34 @@ include "header.php";
 </div>
 
 <script>
-    document.querySelectorAll('.gallery-thumb').forEach(function (thumb) {
-        thumb.addEventListener('click', function () {
-            const src = this.getAttribute('data-image');
-            document.querySelector('#mainImage img').src = src;
-            document.querySelectorAll('.gallery-thumb').forEach(function (t) {
-                t.classList.remove('active');
-            });
-            this.classList.add('active');
+    const gorseller = <?= json_encode($tum_gorseller) ?>;
+    let aktifIndex = 0;
+
+    function gorselGoster(index) {
+        if (index < 0) index = gorseller.length - 1;
+        if (index >= gorseller.length) index = 0;
+        aktifIndex = index;
+        document.getElementById('anaGorselImg').src = gorseller[aktifIndex];
+        document.querySelectorAll('.gallery-thumb').forEach(function(t) {
+            t.classList.toggle('active', parseInt(t.getAttribute('data-index')) === aktifIndex);
+        });
+    }
+
+    document.querySelectorAll('.gallery-thumb').forEach(function(thumb) {
+        thumb.addEventListener('click', function() {
+            gorselGoster(parseInt(this.getAttribute('data-index')));
         });
     });
 
+    const okSol = document.getElementById('okSol');
+    const okSag = document.getElementById('okSag');
+    if (okSol) okSol.addEventListener('click', function() { gorselGoster(aktifIndex - 1); });
+    if (okSag) okSag.addEventListener('click', function() { gorselGoster(aktifIndex + 1); });
+
     let selectedSize = '';
-    document.querySelectorAll('.size-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            document.querySelectorAll('.size-btn').forEach(function (b) {
-                b.classList.remove('active');
-            });
+    document.querySelectorAll('.size-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.size-btn').forEach(function(b) { b.classList.remove('active'); });
             this.classList.add('active');
             selectedSize = this.getAttribute('data-size');
         });
@@ -300,28 +327,14 @@ include "header.php";
     const favBtn = document.getElementById('favBtn');
 
     function getFavorites() {
-        try {
-            const raw = localStorage.getItem(FAV_KEY);
-            const parsed = raw ? JSON.parse(raw) : [];
-            return Array.isArray(parsed) ? parsed : [];
-        } catch (e) { return []; }
+        try { const raw = localStorage.getItem(FAV_KEY); const p = raw ? JSON.parse(raw) : []; return Array.isArray(p) ? p : []; }
+        catch(e) { return []; }
     }
-
-    function saveFavorites(items) {
-        localStorage.setItem(FAV_KEY, JSON.stringify(items));
-    }
-
-    function isFavorite(productId) {
-        return getFavorites().some(function (item) {
-            return String(item.id) === String(productId);
-        });
-    }
-
+    function saveFavorites(items) { localStorage.setItem(FAV_KEY, JSON.stringify(items)); }
+    function isFavorite(id) { return getFavorites().some(function(i) { return String(i.id) === String(id); }); }
     function toggleFavorite(product) {
         const list = getFavorites();
-        const index = list.findIndex(function (item) {
-            return String(item.id) === String(product.id);
-        });
+        const index = list.findIndex(function(i) { return String(i.id) === String(product.id); });
         if (index > -1) { list.splice(index, 1); saveFavorites(list); return false; }
         list.unshift(product); saveFavorites(list); return true;
     }
@@ -332,49 +345,34 @@ include "header.php";
         price: parseFloat(favBtn.getAttribute('data-product-price') || '0'),
         image: favBtn.getAttribute('data-product-image'),
         category: favBtn.getAttribute('data-product-category'),
-        url: 'urun-detay.php?id=' + (favBtn.getAttribute('data-product-id') || '')
+        url: 'urun-detay.php?id=' + favBtn.getAttribute('data-product-id')
     };
 
     if (isFavorite(detailProduct.id)) { favBtn.classList.add('active'); }
-
-    favBtn.addEventListener('click', function () {
+    favBtn.addEventListener('click', function() {
         const added = toggleFavorite(detailProduct);
         this.classList.toggle('active', added);
     });
 
-    // --- DEĞİŞTİRİLEN KISIM BURASI ---
-    document.getElementById('addToCartBtn').addEventListener('click', function () {
-        if (!selectedSize) {
-            alert('Lütfen bir beden seçin.');
-            return;
-        }
-
+    document.getElementById('addToCartBtn').addEventListener('click', function() {
+        if (!selectedSize) { alert('Lütfen bir beden seçin.'); return; }
         const formData = new FormData();
         formData.append('urun_id', '<?= (int)$urun["id"] ?>');
         formData.append('ad', '<?= addslashes($urun["ad"]) ?>');
         formData.append('fiyat', '<?= (float)$urun["fiyat"] ?>');
-        formData.append('gorsel', '<?= addslashes($urun["gorsel"]) ?>');
+        
+        // DEĞİŞİKLİK: JSON'ın kendisini değil, listedeki ilk resmi sepete gönderiyoruz ki sepet sayfasında görsel bozulmasın.
+        formData.append('gorsel', '<?= !empty($tum_gorseller) ? addslashes($tum_gorseller[0]) : "" ?>');
+        
         formData.append('beden', selectedSize);
-
-        fetch('sepet-ekle.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(function(response) {
+        fetch('sepet-ekle.php', { method: 'POST', body: formData })
+        .then(function() {
             alert('Ürün sepete eklendi! Beden: ' + selectedSize);
-
-            let sepetSayaci = document.querySelector('.sepet-sayi');
-            if (sepetSayaci) {
-                let mevcutSayi = parseInt(sepetSayaci.textContent);
-                sepetSayaci.textContent = mevcutSayi + 1;
-            } else {
-                window.location.reload();
-            }
+            let s = document.querySelector('.sepet-sayi');
+            if (s) { s.textContent = parseInt(s.textContent) + 1; }
+            else { window.location.reload(); }
         })
-        .catch(function(error) {
-            alert('Sepete eklerken bir hata oluştu, lütfen tekrar deneyin.');
-            console.error('Hata:', error);
-        });
+        .catch(function(e) { alert('Sepete eklerken bir hata oluştu.'); console.error(e); });
     });
 </script>
 
