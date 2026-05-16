@@ -1,9 +1,9 @@
 <?php
 try {
     $pdo = new PDO(
-        'mysql:host=127.0.0.1;port=8889;dbname=megay_moda;charset=utf8',
-        'root',
-        'root'
+        'mysql:host=localhost;dbname=megaymod_megay_moda;charset=utf8',
+        'megaymod_yenimegay',
+        'sifre123!123'
     );
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {

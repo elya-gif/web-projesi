@@ -85,31 +85,24 @@ if (!empty($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
         .logo {
             position: absolute;
             left: 50%;
-            top: 5%;
-            transform: translateX(-50%);
+            top: 50%;
+            transform: translate(-50%, -50%);
             display: flex;
             justify-content: center;
         }
 
         .logo a {
-            font-size: 24px;
             text-decoration: none;
-            color: black;
-
+            font-family: "Cormorant Garamond", serif;
+            font-size: 48px; /* Orijinal büyük ekran açılış boyutu */
+            letter-spacing: 3px;
+            font-weight: 600;
+            color: #1C1C1C;
             transition: font-size 0.3s ease-in-out;
         }
 
         .scrolled .logo a {
-            font-size: 36px;
-        }
-
-        .logo a {
-            text-decoration: none;
-            font-family: "Cormorant Garamond", serif;
-            font-size: 48px;
-            letter-spacing: 3px;
-            font-weight: 600;
-            color: #1C1C1C;
+            font-size: 36px; /* Orijinal büyük ekran aşağı kaydırılınca küçülme boyutu */
         }
 
         .nav-icons {
@@ -273,6 +266,45 @@ if (!empty($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
                 display: flex;
             }
         }
+
+        /* Tüm Mobil Ekranlar İçin Kesin Çözüm Kümesi */
+        @media (max-width: 991px) {
+            .header {
+                padding: 15px 20px;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+            }
+            .menu-toggle {
+                margin: 0 !important;
+            }
+            .logo {
+                position: static !important;
+                transform: none !important;
+                flex: 1 !important;
+                display: flex !important;
+                justify-content: center !important;
+                padding: 0 10px !important;
+            }
+            .logo a {
+                font-size: 16px !important; /* Mobilde çakışmaması için sabit boyut kalmalı */
+                letter-spacing: 1px !important;
+                white-space: nowrap !important;
+                display: inline-block !important;
+            }
+            .scrolled .logo a {
+                font-size: 16px !important; /* Mobilde scroll efektini devre dışı bıraktık ki taşmasın */
+            }
+            .nav-icons {
+                margin-left: 0 !important;
+                margin-top: 0 !important;
+                gap: 12px !important;
+            }
+            .nav-icons a, .nav-icons svg {
+                width: 20px !important;
+                height: 20px !important;
+            }
+        }
     </style>
 </head>
 
@@ -288,11 +320,10 @@ if (!empty($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
                 <line x1="3" y1="12" x2="21" y2="12"></line>
                 <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
-            <span>Menü</span>
         </button>
 
         <div class="logo">
-            <a href="anasayfa.php">MEGAY MODA</a>
+            <a href="index.php">MEGAY MODA</a>
         </div>
 
         <div class="nav-icons">
@@ -420,5 +451,5 @@ if (!empty($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
         });
 
     </script>
-
 </body>
+</html>
