@@ -101,7 +101,7 @@ $durumRenk = [
     <a href="urun-listesi.php">📦 Ürünler</a>
     <a href="urun-ekle.php">➕ Ürün Ekle</a>
     <a href="siparisler.php" class="active">🛒 Siparişler</a>
-    <a href="../index.php" style="position:absolute; bottom:1rem;">← Siteye Dön</a>
+    <a href="../anasayfa.php" style="position:absolute; bottom:1rem;">← Siteye Dön</a>
 </aside>
 
 <main class="admin-main">
