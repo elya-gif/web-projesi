@@ -148,7 +148,7 @@
             <ul>
 
 
-                <li><a href="sayfalist.php">Ana Sayfa</a></li>
+                <li><a href="anasayfa.php">Ana Sayfa</a></li>
                 <li><a href="iletisim.php">Hakkımızda</a></li>
         
             </ul>
