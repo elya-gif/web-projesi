@@ -12,15 +12,30 @@ $cart_items = [];
 
 if (!empty($_SESSION['sepet'])) {
     foreach ($_SESSION['sepet'] as $urun) {
+        
+        // --- GÖRSEL DÜZELTME BAŞLANGICI ---
+        $sepet_gorsel = 'images/placeholder.jpg'; // Varsayılan boş resim
+        
+        // Eğer session'daki görsel bir JSON dizisiyse (çoklu resimse) çöz ve ilkini al
+        $cozulen_gorsel = json_decode($urun['gorsel'], true);
+        if (is_array($cozulen_gorsel) && count($cozulen_gorsel) > 0) {
+            $sepet_gorsel = $cozulen_gorsel[0];
+        } 
+        // Eski sistemdeki gibi düz bir metinse direkt onu al
+        elseif (!empty($urun['gorsel']) && !is_array($cozulen_gorsel)) {
+            $sepet_gorsel = $urun['gorsel'];
+        }
+        // --- GÖRSEL DÜZELTME BİTİŞİ ---
+
         $cart_items[] = [
             'id'         => $urun['id'],
             'brand'      => 'Megay Moda',
             'name'       => $urun['ad'],
             'price'      => $urun['fiyat'],
-            'image'      => $urun['gorsel'],
+            'image'      => $sepet_gorsel, // Düzenlenen görseli atıyoruz
             'product_no' => $urun['id'],
             'color'      => '-',
-            'size'       => '-',
+            'size'       => isset($urun['beden']) ? $urun['beden'] : '-', // Beden verisi varsa göster
             'qty'        => $urun['adet'],
         ];
     }
@@ -318,7 +333,7 @@ $grand_total = $subtotal + $shipping_estimate;
                          data-product-price="<?php echo htmlspecialchars((string)$item['price'], ENT_QUOTES, 'UTF-8'); ?>"
                          data-product-image="<?php echo htmlspecialchars($item['image'], ENT_QUOTES, 'UTF-8'); ?>">
                         <div class="cart-item-img-wrap">
-                            <img src="images/<?php echo htmlspecialchars($item['image']); ?>" alt="">
+                            <img src="<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
                             <button type="button" class="cart-item-fav" aria-label="Favori">♡</button>
                         </div>
                         <div class="cart-item-body">

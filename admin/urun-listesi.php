@@ -1,15 +1,68 @@
 <?php
+// Olası hataları ekrana yazdırması için (Siyah/beyaz ekranı engeller)
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 include 'auth-check.php';
 
 // Silme işlemi
 if (isset($_GET['sil'])) {
     $silId = (int)$_GET['sil'];
-    $pdo->prepare('DELETE FROM urunler WHERE id = ?')->execute([$silId]);
-    header('Location: urun-listesi.php?mesaj=silindi');
-    exit;
+
+    // --- 1. FİZİKSEL DOSYALARI SİLME BÖLÜMÜ ---
+    $stmtGorsel = $pdo->prepare('SELECT gorsel FROM urunler WHERE id = ?');
+    $stmtGorsel->execute([$silId]);
+    $silinecekUrun = $stmtGorsel->fetch(PDO::FETCH_ASSOC);
+
+    if ($silinecekUrun && !empty($silinecekUrun['gorsel'])) {
+        $gorsel_verisi = (string)$silinecekUrun['gorsel'];
+        $gorseller = json_decode($gorsel_verisi, true);
+
+        // __DIR__ bulunduğumuz klasörü (admin) verir. /../ ile bir üst klasöre çıkıp uploads'a gireriz.
+        if (is_array($gorseller)) {
+            foreach ($gorseller as $gorsel_yolu) {
+                $tam_yol = __DIR__ . '/../' . $gorsel_yolu; 
+                if (file_exists($tam_yol) && is_file($tam_yol)) {
+                    unlink($tam_yol); // Sunucudan dosyayı sil
+                }
+            }
+        } 
+        else {
+            if (strpos($gorsel_verisi, 'uploads/') !== false) {
+                $tam_yol = __DIR__ . '/../' . $gorsel_verisi;
+            } else {
+                $tam_yol = __DIR__ . '/../images/' . $gorsel_verisi;
+            }
+            
+            if (file_exists($tam_yol) && is_file($tam_yol)) {
+                unlink($tam_yol);
+            }
+        }
+    }
+
+    // --- 2. VERİTABANINDAN GÜVENLİ SİLME İŞLEMİ ---
+    try {
+        // Varsa bu ürüne ait sipariş kayıtlarını sil
+        $pdo->prepare('DELETE FROM siparis_urunler WHERE urun_id = ?')->execute([$silId]);
+        
+        // Varsa eski sisteme ait ek görsel kayıtlarını sil
+        $pdo->prepare('DELETE FROM urun_gorselleri WHERE urun_id = ?')->execute([$silId]);
+
+        // Artık ana ürünü güvenle silebiliriz
+        $pdo->prepare('DELETE FROM urunler WHERE id = ?')->execute([$silId]);
+        
+        header('Location: urun-listesi.php?mesaj=silindi');
+        exit;
+    } catch (PDOException $e) {
+        $hataMesaji = urlencode("Bu ürün silinemiyor çünkü başka kayıtlarla bağlantısı var.");
+        header('Location: urun-listesi.php?hata=' . $hataMesaji);
+        exit;
+    }
 }
 
-$urunler = $pdo->query('SELECT * FROM urunler ORDER BY id DESC')->fetchAll(PDO::FETCH_ASSOC);
+// Ürünleri çekme 
+$stmt = $pdo->query('SELECT * FROM urunler ORDER BY id DESC');
+$urunler = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -96,9 +149,15 @@ $urunler = $pdo->query('SELECT * FROM urunler ORDER BY id DESC')->fetchAll(PDO::
     <?php if (isset($_GET['mesaj'])): ?>
         <div class="alert alert-success py-2 mb-3" style="font-size:.85rem;">
             <?php
-            $mesajlar = ['silindi' => 'Ürün silindi.', 'guncellendi' => 'Ürün güncellendi.', 'eklendi' => 'Ürün eklendi.'];
+            $mesajlar = ['silindi' => 'Ürün başarıyla silindi.', 'guncellendi' => 'Ürün güncellendi.', 'eklendi' => 'Ürün eklendi.'];
             echo $mesajlar[$_GET['mesaj']] ?? '';
             ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['hata'])): ?>
+        <div class="alert alert-danger py-2 mb-3" style="font-size:.85rem;">
+            <?php echo htmlspecialchars($_GET['hata']); ?>
         </div>
     <?php endif; ?>
 
@@ -116,11 +175,28 @@ $urunler = $pdo->query('SELECT * FROM urunler ORDER BY id DESC')->fetchAll(PDO::
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($urunler as $urun): ?>
+                <?php foreach ($urunler as $urun): 
+                    
+                    // --- LİSTE İÇİN GÖRSEL AYARLAMA ---
+                    $liste_gorseli = '../images/placeholder.jpg'; 
+                    
+                    $gorsel_metni = (string)($urun['gorsel'] ?? ''); 
+                    $cozulen_gorsel = json_decode($gorsel_metni, true);
+                    
+                    if (is_array($cozulen_gorsel) && !empty($cozulen_gorsel)) {
+                        $liste_gorseli = '../' . $cozulen_gorsel[0]; 
+                    } elseif (!empty($gorsel_metni) && !is_array($cozulen_gorsel)) {
+                        if (strpos($gorsel_metni, 'uploads/') !== false) {
+                            $liste_gorseli = '../' . $gorsel_metni;
+                        } else {
+                            $liste_gorseli = '../images/' . $gorsel_metni;
+                        }
+                    }
+                ?>
                 <tr>
                     <td>#<?php echo $urun['id']; ?></td>
                     <td>
-                        <img src="../images/<?php echo htmlspecialchars($urun['gorsel']); ?>" alt="">
+                        <img src="<?php echo htmlspecialchars($liste_gorseli); ?>" alt="Ürün Görseli">
                     </td>
                     <td><?php echo htmlspecialchars($urun['ad']); ?></td>
                     <td><?php echo htmlspecialchars($urun['kategori']); ?></td>
@@ -132,7 +208,7 @@ $urunler = $pdo->query('SELECT * FROM urunler ORDER BY id DESC')->fetchAll(PDO::
                         <a href="urun-duzenle.php?id=<?php echo $urun['id']; ?>" class="btn-duzenle">Düzenle</a>
                         <a href="urun-listesi.php?sil=<?php echo $urun['id']; ?>"
                            class="btn-sil ms-1"
-                           onclick="return confirm('Bu ürünü silmek istediğinize emin misiniz?')">Sil</a>
+                           onclick="return confirm('Bu ürünü ve sistemdeki görsellerini kalıcı olarak silmek istediğinize emin misiniz?')">Sil</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>
