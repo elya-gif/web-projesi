@@ -85,31 +85,24 @@ if (!empty($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
         .logo {
             position: absolute;
             left: 50%;
-            top: 5%;
-            transform: translateX(-50%);
+            top: 50%;
+            transform: translate(-50%, -50%);
             display: flex;
             justify-content: center;
         }
 
         .logo a {
-            font-size: 24px;
             text-decoration: none;
-            color: black;
-
+            font-family: "Cormorant Garamond", serif;
+            font-size: 48px; /* Orijinal büyük ekran açılış boyutu */
+            letter-spacing: 3px;
+            font-weight: 600;
+            color: #1C1C1C;
             transition: font-size 0.3s ease-in-out;
         }
 
         .scrolled .logo a {
-            font-size: 36px;
-        }
-
-        .logo a {
-            text-decoration: none;
-            font-family: "Cormorant Garamond", serif;
-            font-size: 48px;
-            letter-spacing: 3px;
-            font-weight: 600;
-            color: #1C1C1C;
+            font-size: 36px; /* Orijinal büyük ekran aşağı kaydırılınca küçülme boyutu */
         }
 
         .nav-icons {
@@ -274,7 +267,7 @@ if (!empty($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
             }
         }
 
-
+        /* Tüm Mobil Ekranlar İçin Kesin Çözüm Kümesi */
         @media (max-width: 991px) {
             .header {
                 padding: 15px 20px;
@@ -294,13 +287,13 @@ if (!empty($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
                 padding: 0 10px !important;
             }
             .logo a {
-                font-size: 16px !important; 
+                font-size: 16px !important; /* Mobilde çakışmaması için sabit boyut kalmalı */
                 letter-spacing: 1px !important;
                 white-space: nowrap !important;
                 display: inline-block !important;
             }
             .scrolled .logo a {
-                font-size: 16px !important;
+                font-size: 16px !important; /* Mobilde scroll efektini devre dışı bıraktık ki taşmasın */
             }
             .nav-icons {
                 margin-left: 0 !important;
