@@ -273,6 +273,45 @@ if (!empty($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
                 display: flex;
             }
         }
+
+
+        @media (max-width: 991px) {
+            .header {
+                padding: 15px 20px;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+            }
+            .menu-toggle {
+                margin: 0 !important;
+            }
+            .logo {
+                position: static !important;
+                transform: none !important;
+                flex: 1 !important;
+                display: flex !important;
+                justify-content: center !important;
+                padding: 0 10px !important;
+            }
+            .logo a {
+                font-size: 16px !important; 
+                letter-spacing: 1px !important;
+                white-space: nowrap !important;
+                display: inline-block !important;
+            }
+            .scrolled .logo a {
+                font-size: 16px !important;
+            }
+            .nav-icons {
+                margin-left: 0 !important;
+                margin-top: 0 !important;
+                gap: 12px !important;
+            }
+            .nav-icons a, .nav-icons svg {
+                width: 20px !important;
+                height: 20px !important;
+            }
+        }
     </style>
 </head>
 
@@ -288,7 +327,6 @@ if (!empty($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
                 <line x1="3" y1="12" x2="21" y2="12"></line>
                 <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
-            <span>Menü</span>
         </button>
 
         <div class="logo">
@@ -420,5 +458,5 @@ if (!empty($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
         });
 
     </script>
-
 </body>
+</html>
