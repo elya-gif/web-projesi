@@ -323,7 +323,7 @@ if (!empty($_SESSION['sepet']) && is_array($_SESSION['sepet'])) {
         </button>
 
         <div class="logo">
-            <a href="anasayfa.php">MEGAY MODA</a>
+            <a href="index.php">MEGAY MODA</a>
         </div>
 
         <div class="nav-icons">
