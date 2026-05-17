@@ -12,35 +12,30 @@ if (!$urun) {
     exit;
 }
 
-// Tüm görselleri topla
 $tum_gorseller = [];
 
-// 1. Yeni Sistem: JSON olarak kaydedilen çoklu görselleri ayıkla
 if (!empty($urun['gorsel'])) {
     $cozulen_gorseller = json_decode($urun['gorsel'], true);
     
-    // Eğer json_decode başarılıysa ve bu bir diziyse (çoklu resim varsa)
     if (is_array($cozulen_gorseller)) {
         foreach ($cozulen_gorseller as $g) {
             $tum_gorseller[] = $g;
         }
     } else {
-        // Eski sistem tek resim eklendiyse (geriye dönük uyumluluk)
         $tum_gorseller[] = $urun['gorsel'];
     }
 }
 
-// 2. Eski Sistem (urun_gorselleri tablosundan gelenler - Varsa bozulmasın diye tutuyoruz)
-$stmt2 = $pdo->prepare('SELECT gorsel_yolu FROM urun_gorselleri WHERE urun_id = ? ORDER BY sira ASC');
-$stmt2->execute([$id]);
-$ek = $stmt2->fetchAll(PDO::FETCH_COLUMN);
-foreach ($ek as $e) {
-    if (!in_array($e, $tum_gorseller)) {
-        $tum_gorseller[] = $e;
-    }
-}
+// $stmt2 = $pdo->prepare('SELECT gorsel_yolu FROM urun_gorselleri WHERE urun_id = ? ORDER BY sira ASC');
+// $stmt2->execute([$id]);
+// $ek = $stmt2->fetchAll(PDO::FETCH_COLUMN);
+// foreach ($ek as $e) {
+//     if (!in_array($e, $tum_gorseller)) {
+//         $tum_gorseller[] = $e;
+//     }
+// }
 
-$gorsel_sayisi = count($tum_gorseller);
+// $gorsel_sayisi = count($tum_gorseller);
 
 include "header.php";
 ?>
@@ -215,13 +210,13 @@ include "header.php";
                          src="<?= !empty($tum_gorseller) ? htmlspecialchars($tum_gorseller[0]) : 'images/placeholder.jpg' ?>"
                          alt="<?= htmlspecialchars($urun['ad']) ?>">
 
-                    <?php if ($gorsel_sayisi > 1): ?>
+                    <!-- <?php if ($gorsel_sayisi > 1): ?>
                         <button class="galeri-ok sol" id="okSol">&#8592;</button>
                         <button class="galeri-ok sag" id="okSag">&#8594;</button>
-                    <?php endif; ?>
+                    <?php endif; ?> -->
                 </div>
 
-                <?php if ($gorsel_sayisi > 1): ?>
+                <!-- <?php if ($gorsel_sayisi > 1): ?>
                 <div class="gallery-thumbs mt-2">
                     <?php foreach ($tum_gorseller as $i => $g): ?>
                         <div class="gallery-thumb <?= $i === 0 ? 'active' : '' ?>"
@@ -231,7 +226,7 @@ include "header.php";
                         </div>
                     <?php endforeach; ?>
                 </div>
-                <?php endif; ?>
+                <?php endif; ?> -->
 
             </div>
         </div>
