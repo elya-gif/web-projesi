@@ -423,7 +423,7 @@ include 'header.php';
         btn.addEventListener('click', function () {
             const card = this.closest('.pb-product-card');
             const productId = card.getAttribute('data-product-id');
-            window.location.href = 'urun-detay.php?id=' + productId;
+            window.location.href = '<?php echo rtrim((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']), '/'); ?>/urun-detay.php?id=' + productId;
         });
     });
 
