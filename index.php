@@ -1,7 +1,7 @@
 <?php
 include 'config.php';
 
-$yeni_urunler = $pdo->query('SELECT id, ad, fiyat, gorsel, kategori FROM urunler ORDER BY id DESC LIMIT 4')->fetchAll(PDO::FETCH_ASSOC);
+$yeni_urunler = $pdo->query('SELECT id, ad, fiyat, gorsel, kategori FROM urunler ORDER BY id DESC LIMIT 8')->fetchAll(PDO::FETCH_ASSOC);
 
 $kategoriler = [
     ['slug' => 'elbiseler', 'ad' => 'Elbise',   'ikon' => '👗'],
@@ -472,9 +472,18 @@ include 'header.php';
             <?php foreach ($yeni_urunler as $u): ?>
                 <a href="urun-detay.php?id=<?php echo $u['id']; ?>" class="urun-kart">
                     <div class="urun-img-wrap">
-                        <img src="images/<?php echo htmlspecialchars($u['gorsel']); ?>"
+                        <?php
+                            $gorsel_val = $u['gorsel'];
+                            $gorseller_arr = json_decode($gorsel_val, true);
+                            if (is_array($gorseller_arr) && !empty($gorseller_arr)) {
+                                $gorsel_src = htmlspecialchars($gorseller_arr[0]);
+                            } else {
+                                $gorsel_src = htmlspecialchars($gorsel_val);
+                            }
+                        ?>
+                        <img src="<?php echo $gorsel_src; ?>"
                              alt="<?php echo htmlspecialchars($u['ad']); ?>"
-                             onerror="this.style.display='none'">
+                             onerror="this.src='images/placeholder.jpg'">
                     </div>
                     <span class="urun-yeni-badge">Yeni</span>
                     <div class="urun-info">

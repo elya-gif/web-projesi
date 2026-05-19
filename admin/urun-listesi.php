@@ -206,9 +206,9 @@ $urunler = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
                     </td>
                     <td>
                         <a href="urun-duzenle.php?id=<?php echo $urun['id']; ?>" class="btn-duzenle">Düzenle</a>
-                        <a href="urun-listesi.php?sil=<?php echo $urun['id']; ?>"
+                        <a href="urun-sil.php?id=<?php echo $urun['id']; ?>"
                            class="btn-sil ms-1"
-                           onclick="return confirm('Bu ürünü ve sistemdeki görsellerini kalıcı olarak silmek istediğinize emin misiniz?')">Sil</a>
+                           onclick="return confirm('Bu ürünü silmek istediğinize emin misiniz?')">Sil</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>

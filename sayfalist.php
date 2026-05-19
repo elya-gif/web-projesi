@@ -7,23 +7,23 @@ include 'config.php';
 $currentCategory = isset($_GET['kategori']) ? $_GET['kategori'] : 'tum';
 
 $categories = [
-    'tum'       => 'Tüm Ürünler',
+    'tum' => 'Tüm Ürünler',
     'elbiseler' => 'Elbiseler',
-    'ceketler'  => 'Ceketler',
-    'toplar'    => 'Toplar',
-    'bodyler'   => 'Bodyler',
-    'sortlar'   => 'Şortlar',
+    'ceketler' => 'Ceketler',
+    'toplar' => 'Toplar',
+    'bodyler' => 'Bodyler',
+    'sortlar' => 'Şortlar',
     'tisortler' => 'Tişörtler',
-    'etek'      => 'Etekler',
-    'gomlek'    => 'Gömlekler',
-    'kazak'     => 'Kazaklar',
+    'etek' => 'Etekler',
+    'gomlek' => 'Gömlekler',
+    'kazak' => 'Kazaklar',
 ];
 
 if ($currentCategory !== 'tum') {
-    $stmt = $pdo->prepare('SELECT * FROM urunler WHERE kategori = ?');
+    $stmt = $pdo->prepare('SELECT * FROM urunler WHERE aktif = 1 AND kategori = ?');
     $stmt->execute([$currentCategory]);
 } else {
-    $stmt = $pdo->query('SELECT * FROM urunler');
+    $stmt = $pdo->query('SELECT * FROM urunler WHERE aktif = 1');
 }
 
 $urunler = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -52,7 +52,9 @@ include 'header.php';
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    .pb-collection-header { margin-bottom: 1.5rem; }
+    .pb-collection-header {
+        margin-bottom: 1.5rem;
+    }
 
     .pb-collection-title {
         font-size: 1.75rem;
@@ -80,8 +82,8 @@ include 'header.php';
 
     .pb-product-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 16px 35px rgba(0,0,0,.06);
-        border-color: rgba(0,0,0,.08);
+        box-shadow: 0 16px 35px rgba(0, 0, 0, .06);
+        border-color: rgba(0, 0, 0, .08);
     }
 
     .pb-image-wrapper {
@@ -99,7 +101,9 @@ include 'header.php';
         transition: transform .4s ease;
     }
 
-    .pb-product-card:hover .pb-image-wrapper img { transform: scale(1.05); }
+    .pb-product-card:hover .pb-image-wrapper img {
+        transform: scale(1.05);
+    }
 
     .pb-actions-top {
         position: absolute;
@@ -116,7 +120,7 @@ include 'header.php';
         height: 32px;
         border-radius: 999px;
         border: none;
-        background-color: rgba(255,255,255,.92);
+        background-color: rgba(255, 255, 255, .92);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -128,17 +132,24 @@ include 'header.php';
     .pb-icon-btn:hover {
         background-color: #fff;
         transform: translateY(-1px);
-        box-shadow: 0 6px 14px rgba(0,0,0,.18);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, .18);
     }
 
-    .pb-heart { color: #888; }
-    .pb-heart.active { color: var(--heart-active); }
+    .pb-heart {
+        color: #888;
+    }
+
+    .pb-heart.active {
+        color: var(--heart-active);
+    }
 
     .pb-hover-panel {
         position: absolute;
-        left: 0; right: 0; bottom: -80px;
+        left: 0;
+        right: 0;
+        bottom: -80px;
         padding: .5rem .6rem;
-        background-color: rgba(255,255,255,.96);
+        background-color: rgba(255, 255, 255, .96);
         display: flex;
         gap: .4rem;
         align-items: center;
@@ -146,9 +157,15 @@ include 'header.php';
         z-index: 2;
     }
 
-    .pb-product-card:hover .pb-hover-panel { bottom: 0; }
+    .pb-product-card:hover .pb-hover-panel {
+        bottom: 0;
+    }
 
-    @media (max-width: 768px) { .pb-hover-panel { bottom: -80px; } }
+    @media (max-width: 768px) {
+        .pb-hover-panel {
+            bottom: -80px;
+        }
+    }
 
     .pb-size-select {
         flex: 1;
@@ -170,7 +187,9 @@ include 'header.php';
         cursor: pointer;
     }
 
-    .pb-hover-add:hover { background-color: #111; }
+    .pb-hover-add:hover {
+        background-color: #111;
+    }
 
     .pb-info {
         padding: .25rem .25rem .2rem;
@@ -180,7 +199,10 @@ include 'header.php';
         flex-grow: 1;
     }
 
-    .pb-name { font-size: .9rem; font-weight: 500; }
+    .pb-name {
+        font-size: .9rem;
+        font-weight: 500;
+    }
 
     .pb-price-row {
         display: flex;
@@ -188,7 +210,10 @@ include 'header.php';
         gap: .4rem;
     }
 
-    .pb-price { font-size: .95rem; font-weight: 600; }
+    .pb-price {
+        font-size: .95rem;
+        font-weight: 600;
+    }
 
     .pb-meta {
         font-size: .7rem;
@@ -206,8 +231,10 @@ include 'header.php';
 
     .pb-scroll-top {
         position: fixed;
-        right: 18px; bottom: 18px;
-        width: 40px; height: 40px;
+        right: 18px;
+        bottom: 18px;
+        width: 40px;
+        height: 40px;
         border: 1px solid #000;
         background-color: #fff;
         color: #000;
@@ -221,8 +248,15 @@ include 'header.php';
         transition: opacity .2s ease;
     }
 
-    .pb-scroll-top.visible { opacity: 1; pointer-events: auto; }
-    .pb-scroll-top span { font-size: 1.1rem; line-height: 1; }
+    .pb-scroll-top.visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .pb-scroll-top span {
+        font-size: 1.1rem;
+        line-height: 1;
+    }
 </style>
 
 <div class="container py-4">
@@ -242,35 +276,32 @@ include 'header.php';
     <?php else: ?>
         <div class="row g-3 g-md-4">
             <?php foreach ($urunler as $urun):
-                
+
                 // --- KART GÖRSELİ AYARLAMA (JSON ÇÖZÜMÜ) ---
-                $kart_gorsel = 'images/placeholder.jpg'; 
-                $gorsel_metni = (string)($urun['gorsel'] ?? ''); 
+                $kart_gorsel = 'images/placeholder.jpg';
+                $gorsel_metni = (string) ($urun['gorsel'] ?? '');
                 $cozulen_gorsel = json_decode($gorsel_metni, true);
-                
+
                 // Eğer yeni sistemle (JSON dizisi) eklendiyse ilk resmi al
                 if (is_array($cozulen_gorsel) && !empty($cozulen_gorsel)) {
-                    $kart_gorsel = $cozulen_gorsel[0]; 
-                } 
+                    $kart_gorsel = $cozulen_gorsel[0];
+                }
                 // Eğer eski sistemle eklendiyse direkt al
                 elseif (!empty($gorsel_metni) && !is_array($cozulen_gorsel)) {
                     $kart_gorsel = $gorsel_metni;
                 }
                 // -------------------------------------------
-            ?>
+                ?>
                 <div class="col-6 col-md-4 col-lg-3">
-                    <div class="pb-product-card"
-                         data-product-id="<?php echo (int)$urun['id']; ?>"
-                         data-product-name="<?php echo htmlspecialchars($urun['ad'], ENT_QUOTES); ?>"
-                         data-product-price="<?php echo htmlspecialchars((string)$urun['fiyat'], ENT_QUOTES); ?>"
-                         data-product-image="<?php echo htmlspecialchars($kart_gorsel, ENT_QUOTES); ?>"
-                         data-product-category="<?php echo htmlspecialchars($urun['kategori'], ENT_QUOTES); ?>">
+                    <div class="pb-product-card" data-product-id="<?php echo (int) $urun['id']; ?>"
+                        data-product-name="<?php echo htmlspecialchars($urun['ad'], ENT_QUOTES); ?>"
+                        data-product-price="<?php echo htmlspecialchars((string) $urun['fiyat'], ENT_QUOTES); ?>"
+                        data-product-image="<?php echo htmlspecialchars($kart_gorsel, ENT_QUOTES); ?>"
+                        data-product-category="<?php echo htmlspecialchars($urun['kategori'], ENT_QUOTES); ?>">
 
                         <div class="pb-image-wrapper">
-                            <img
-                                src="<?php echo htmlspecialchars($kart_gorsel); ?>"
-                                alt="<?php echo htmlspecialchars($urun['ad']); ?>"
-                            >
+                            <img src="<?php echo htmlspecialchars($kart_gorsel); ?>"
+                                alt="<?php echo htmlspecialchars($urun['ad']); ?>">
 
                             <div class="pb-actions-top">
                                 <button class="pb-icon-btn js-fav" type="button" aria-label="Favorilere ekle">
@@ -322,7 +353,9 @@ include 'header.php';
     <span>&uarr;</span>
 </button>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
 
 <script>
     const FAV_KEY = 'megay_favorites';
@@ -385,7 +418,6 @@ include 'header.php';
                 alert('Lütfen beden seçiniz.');
                 return;
             }
-
             const productId = card.getAttribute('data-product-id');
             const productName = card.getAttribute('data-product-name');
             const productPrice = card.getAttribute('data-product-price');
@@ -402,20 +434,20 @@ include 'header.php';
                 method: 'POST',
                 body: formData
             })
-            .then(function(response) {
-                alert('Ürün sepete eklendi! Beden: ' + size);
-                let sepetSayaci = document.querySelector('.sepet-sayi');
-                if (sepetSayaci) {
-                    let mevcutSayi = parseInt(sepetSayaci.textContent);
-                    sepetSayaci.textContent = mevcutSayi + 1;
-                } else {
-                    window.location.reload();
-                }
-            })
-            .catch(function(error) {
-                alert('Sepete eklerken bir hata oluştu.');
-                console.error('Hata:', error);
-            });
+                .then(function (response) {
+                    alert('Ürün sepete eklendi! Beden: ' + size);
+                    let sepetSayaci = document.querySelector('.sepet-sayi');
+                    if (sepetSayaci) {
+                        let mevcutSayi = parseInt(sepetSayaci.textContent);
+                        sepetSayaci.textContent = mevcutSayi + 1;
+                    } else {
+                        window.location.reload();
+                    }
+                })
+                .catch(function (error) {
+                    alert('Sepete eklerken bir hata oluştu.');
+                    console.error('Hata:', error);
+                });
         });
     });
 

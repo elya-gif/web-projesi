@@ -28,8 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $uzanti = strtolower(pathinfo($_FILES['gorsel']['name'], PATHINFO_EXTENSION));
         if (in_array($uzanti, $izinliUzantilar)) {
             $yeniAd = uniqid('urun_') . '.' . $uzanti;
-            move_uploaded_file($_FILES['gorsel']['tmp_name'], '../images/' . $yeniAd);
-            $gorsel = $yeniAd;
+            if (move_uploaded_file($_FILES['gorsel']['tmp_name'], "../uploads/$yeniAd")) {
+                $gorsel = "uploads/".$yeniAd;
+            } else {
+                $hata = 'Görsel yüklenemedi. Klasör izinlerini kontrol edin.';
+            }
         } else {
             $hata = 'Sadece jpg, jpeg, png, webp yüklenebilir.';
         }

@@ -81,7 +81,7 @@ $q = trim($_GET['q'] ?? '');
 $urunler = [];
 
 if (!empty($q)) {
-    $stmt = $pdo->prepare('SELECT * FROM urunler WHERE ad LIKE ?');
+    $stmt = $pdo->prepare('SELECT * FROM urunler WHERE aktif = 1 AND ad LIKE ?');
     $stmt->execute(['%' . $q . '%']);
     $urunler = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
