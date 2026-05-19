@@ -3,7 +3,7 @@ include 'config.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-$stmt = $pdo->prepare('SELECT * FROM urunler WHERE id = ?');
+$stmt = $pdo->prepare('SELECT * FROM urunler WHERE aktif = 1 AND id = ?');
 $stmt->execute([$id]);
 $urun = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -190,9 +190,14 @@ include "header.php";
     .stok-uyari { font-size: .85rem; color: #e63946; margin-bottom: .75rem; }
 
     @media (max-width: 768px) {
-        .page-wrapper { padding-top: 16px; }
+        .page-wrapper { padding: 12px 12px 40px; }
         .product-title { margin-top: 12px; }
         .galeri-alan { max-width: 100%; }
+        .action-row { flex-wrap: nowrap; gap: .4rem; }
+        .btn-add-to-cart { flex: 1; min-width: 0; padding: .65rem .6rem; font-size: .75rem; }
+        .btn-fav { flex-shrink: 0; width: 44px; height: 44px; }
+        .size-grid { gap: .4rem; }
+        .size-btn { min-width: 40px; padding: .4rem .45rem; font-size: .78rem; }
     }
 </style>
 
@@ -230,7 +235,6 @@ include "header.php";
 
             </div>
         </div>
-
         <div class="col-12 col-md-5">
             <h1 class="product-title"><?= htmlspecialchars($urun['ad']) ?></h1>
             <div class="product-price"><?= number_format($urun['fiyat'], 2, ',', '.') ?> TL</div>
